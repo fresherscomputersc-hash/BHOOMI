@@ -1,0 +1,21 @@
+# BhuVerify - EC2 pilot tier ONLY (local branch `ec2-pilot`, NEVER push to GitHub).
+#
+# The GitHub/Render image uses requirements.txt (Tesseract + rapidfuzz only).
+# Install this on the EC2 box with:
+#   pip install -r requirements-ec2.txt
+#   python -m spacy download en_core_web_sm
+#
+# Heavy: torch CPU ~2GB, transformers models cache on first use (see
+# Dockerfile.ec2). No GPU required, but batch throughput wants one.
+
+# --- Base (same as Render) ---------------------------------------------------
+-r requirements.txt
+
+# --- spaCy (CPU NER + EntityRuler) -------------------------------------------
+spacy>=3.7,<4
+
+# --- Hugging Face transformers (local NER + TrOCR, CPU) ----------------------
+transformers>=4.40
+torch>=2.2
+Pillow>=10         # TrOCR image processor (already via requirements.txt Pillow)
+sentencepiece>=0.1 # XLM-R / Indic tokenizers

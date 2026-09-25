@@ -20,6 +20,16 @@ from app.services.worker import queue_status
 router = APIRouter(prefix="/api/v1/system", tags=["system"])
 
 
+def _pilot_nlp_status() -> dict:
+    """EC2 pilot status without importing torch/spacy at router import time."""
+    try:
+        from app.services import hf_transformer, nlp_spacy
+
+        return {"spacy": nlp_spacy.status(), "hf": hf_transformer.status()}
+    except Exception:
+        return {"spacy": {"enabled": False}, "hf": {"ner_enabled": False}}
+
+
 @router.get("/status")
 def status(user: User = Depends(security.get_current_user),
            db: Session = Depends(get_db)):
@@ -38,6 +48,7 @@ def status(user: User = Depends(security.get_current_user),
         },
         "ocr": engine_status(),
         "llm": llm_status(),
+        "nlp": _pilot_nlp_status(),
         "gis": layer().summary(),
         "cross_db": adapter_status(),
         "queue": queue_status(),

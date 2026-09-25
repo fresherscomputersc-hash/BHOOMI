@@ -111,5 +111,30 @@ class Settings:
         default_factory=lambda: float(os.getenv("GROQ_TIMEOUT_S", "5"))
     )
 
+    # EC2 pilot tier: spaCy + HF transformers (LOCAL branch only, never GitHub).
+    # Both disabled by default; enable with SPACY_ENABLED=1 / HF_ENABLED=1
+    # after installing requirements-ec2.txt. Lazy imports so the GitHub/Render
+    # image (requirements.txt) keeps working with these flags off.
+    spacy_enabled: bool = field(
+        default_factory=lambda: os.getenv("SPACY_ENABLED", "0") == "1"
+    )
+    spacy_model: str = field(
+        default_factory=lambda: os.getenv("SPACY_MODEL", "en_core_web_sm")
+    )
+    hf_enabled: bool = field(
+        default_factory=lambda: os.getenv("HF_ENABLED", "0") == "1"
+    )
+    hf_ner_model: str = field(
+        default_factory=lambda: os.getenv(
+            "HF_NER_MODEL", "Davlan/xlm-roberta-base-ner-hrl")
+    )
+    hf_htr_enabled: bool = field(
+        default_factory=lambda: os.getenv("HF_HTR_ENABLED", "0") == "1"
+    )
+    hf_htr_model: str = field(
+        default_factory=lambda: os.getenv(
+            "HF_HTR_MODEL", "microsoft/trocr-base-handwritten")
+    )
+
 
 settings = Settings()

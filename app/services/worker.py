@@ -360,6 +360,28 @@ def process_document(document_id: int) -> dict:
                     )
             except Exception:
                 groq_applied = []
+            # EC2 pilot tier (local branch only): spaCy NER then HF transformer
+            # NER. Each is verifier-only with the same never-overwrite +
+            # profile-prohibited gates; all disabled unless env-enabled.
+            for _stage, _modname, _actor in (
+                ("spacy", "app.services.nlp_spacy", "spacy-ner-verifier"),
+                ("hf", "app.services.hf_transformer", "hf-transformer-verifier"),
+            ):
+                try:
+                    import importlib as _il
+
+                    _mod = _il.import_module(_modname)
+                    outcome, _applied = _mod.enhance_outcome(ocr["text"], outcome)
+                    if _applied:
+                        audit.log_action(
+                            db, ActionType.FIELD_EXTRACTED, actor_label=_actor,
+                            entity_type="document", entity_id=document.doc_id,
+                            document_id=document.id,
+                            detail=f"{_stage} filled {len(_applied)} field(s): "
+                                   f"{', '.join(sorted(_applied))}",
+                        )
+                except Exception:
+                    continue
             doc_type, doc_type_confidence = classify_document_type(outcome)
 
             record = document.record
