@@ -103,8 +103,14 @@ def main() -> None:
         try:
             resp = upload(token, path)
             docs = resp.get("documents") or []
-            doc_id = (docs[0].get("doc_id") if docs
-                      else (resp.get("accepted") or ["?"])[0])
+            skipped = resp.get("skipped_duplicates") or []
+            if docs:
+                doc_id = docs[0].get("doc_id")
+            elif skipped:
+                # Re-run on an already-ingested file: report the existing doc.
+                doc_id = skipped[0].get("existing_doc_id")
+            else:
+                doc_id = (resp.get("accepted") or ["?"])[0]
             summary = summarize(token, doc_id)
         except Exception as e:  # noqa: BLE001 - report, don't stop
             summary = {"file": path, "error": f"{type(e).__name__}: {e}"}

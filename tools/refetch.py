@@ -16,11 +16,16 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--dir", default="data/stress")
     ap.add_argument("--base", default="http://127.0.0.1:8001")
+    ap.add_argument("--docs", default="",
+                    help="comma-separated doc_ids to refetch instead of report.json")
     args = ap.parse_args()
     import run_stress
     run_stress.BASE = args.base
     token = login()
-    prior = json.load(open(args.dir + "/report.json"))
+    if args.docs:
+        prior = [{"doc_id": d.strip()} for d in args.docs.split(",") if d.strip()]
+    else:
+        prior = json.load(open(args.dir + "/report.json"))
     full = []
     for item in prior:
         doc_id = item.get("doc_id")
