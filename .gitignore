@@ -16,4 +16,6 @@ data/stress_hindi/
 data/stress_english/
 data/geojson/
 data/reports/
+# Real Bhulekh RoRs (owner PII) must never enter git.
+/sample/*.pdf
 bhuverify-key.pem

@@ -82,4 +82,6 @@ def test_zero_area_stays_missing():
 
 def test_guardian_cell_boundary():
     text = "Guardian : S/o Late Balaram Sahoo | 123/4 | 567"
-    assert _get(text, "guardian_name").normalized_value == "Late Balaram Sahoo"
+    # Relation prefix + deceased-marker are labels, not the name; the table
+    # cells after the pipe must not leak in either.
+    assert _get(text, "guardian_name").normalized_value == "Balaram Sahoo"
