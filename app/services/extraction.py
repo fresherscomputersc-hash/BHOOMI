@@ -427,6 +427,7 @@ class SubPlot:
     area_unit: str
     area_hectare: float
     evidence_text: str
+    kisam: str = ""  # raw kisam word off a 39-A parcel row, "" when none
 
 
 @dataclass
@@ -955,8 +956,30 @@ def _parcel_rows_39a(raw_lines: list[str], taken: set[str] | None = None) -> lis
             area_unit=area_unit,
             area_hectare=area_ha,
             evidence_text=line.strip()[:200],
+            kisam=_kisam_word(line),
         ))
     return found
+
+
+def _kisam_word(line: str) -> str:
+    """Raw kisam word off a parcel-table line, "" when none.
+
+    Matches the canonical alias map longest-first, so "ଘରବାରି" wins over
+    a shorter accidental substring. Latin keys only match on word
+    boundaries, so cross-script false hits cannot happen.
+    """
+    from app.master_data import CLASSIFICATION_ALIASES
+
+    lowered = line.lower()
+    for key in sorted(CLASSIFICATION_ALIASES, key=len, reverse=True):
+        if len(key) < 3:
+            continue
+        if key.isascii() and not re.search(
+                r"(?<![a-z])" + re.escape(key) + r"(?![a-z])", lowered):
+            continue
+        if key in lowered:
+            return key
+    return ""
 
 
 KHATIYAN_SECTION_HINT = re.compile(r"ଖତିୟାନ[^\n:]{0,24}:\s*(\d{1,6})")
@@ -1317,18 +1340,20 @@ def extract_fields(
         }
         sub_plots.extend(_parcel_rows_39a(raw_lines, taken_numbers))
 
-    # ---- Form 39-A parcel-table area fallback ------------------------------
-    # Real Khatiyan PDFs carry no "Area:" label; the parcel table is the area
-    # source. First non-empty khatiyan section only - later sections on a
-    # multi-khatiyan print belong to neighbours. Confidence stays review-bound.
-    if profile == DOC_PROFILE_ODISHA_39A and not area_field.normalized_value:
+    # ---- Form 39-A parcel-table fallbacks ----------------------------------
+    # Real Khatiyan PDFs carry no "Area:"/"Classification:" labels; the
+    # parcel table is the source for both. First non-empty khatiyan section
+    # only - later sections on a multi-khatiyan print belong to neighbours.
+    # Confidence stays review-bound; the reviewer owns the total.
+    first_section_rows: list[SubPlot] = []
+    if profile == DOC_PROFILE_ODISHA_39A:
         for section in _parcel_sections_39a(raw_lines):
-            section_rows = _parcel_rows_39a(section, taken_numbers)
-            if not section_rows:
-                continue
-            total = round(sum(r.area_hectare for r in section_rows), 6)
-            if total <= 0:
-                continue
+            first_section_rows = _parcel_rows_39a(section, taken_numbers)
+            if first_section_rows:
+                break
+    if first_section_rows and not area_field.normalized_value:
+        total = round(sum(r.area_hectare for r in first_section_rows), 6)
+        if total > 0:
             area_hectare = total
             unit_ok = True
             area_field.value = f"{total} hectare"
@@ -1337,10 +1362,31 @@ def extract_fields(
             area_field.source = "parcel_row"
             area_field.method = "parcel_table_first_section"
             area_field.evidence_text = "; ".join(
-                r.evidence_text for r in section_rows[:2])[:200]
+                r.evidence_text for r in first_section_rows[:2])[:200]
             area_field.signals["area_unit_detected"] = "hectare"
             area_field.signals["area_hectare"] = total
-            break
+    class_field = fields.get("land_classification")
+    if first_section_rows and class_field is not None \
+            and not class_field.normalized_value:
+        from collections import Counter
+
+        from app.master_data import CLASSIFICATION_ALIASES, canonical_classification
+
+        votes = Counter(r.kisam for r in first_section_rows if r.kisam)
+        if votes:
+            word, _count = votes.most_common(1)[0]
+            # Only recognised alias words become values; unknown print
+            # stays honestly missing instead of laundering OCR noise.
+            if word.lower() in CLASSIFICATION_ALIASES:
+                canon = canonical_classification(word)
+                class_field.value = word[:200]
+                class_field.normalized_value = canon[:200]
+                class_field.confidence = 60.0
+                class_field.source = "parcel_row"
+                class_field.method = "parcel_kisam_first_section"
+                class_field.evidence_text = "; ".join(
+                    r.evidence_text for r in first_section_rows
+                    if r.kisam == word)[:200]
 
     # ---- bare-number plot fallback (Form 39-A page 2+, header lost) --------
     # Parcel tables often lose their header in OCR while the number survives

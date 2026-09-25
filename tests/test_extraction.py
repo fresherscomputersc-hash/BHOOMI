@@ -126,3 +126,41 @@ def test_person_parser_skips_tax_prose():
     owners2, _res2 = parse_praja_section(lines2)
     assert len(owners2) == 1
     assert owners2[0]["relation_type"] == "father"
+
+
+def test_parcel_row_captures_kisam_word():
+    rows = _parcel_rows_39a(["Plot 488 8400 | 0.3399 କୃଷି"])
+    assert len(rows) == 1
+    assert rows[0].kisam == "କୃଷି"
+
+
+def test_classification_fallback_from_parcel_kisam():
+    text = (
+        "Schedule I Form No.39-A\n"
+        "Plot 488 8400 | 0.3399 କୃଷି\n"
+        "Plot 489 0300 | 0.0121 କୃଷି\n"
+    )
+    out = extract_fields(text, [], profile="odisha_khatiyan_39a")
+    assert out.fields["land_classification"].normalized_value == "Agricultural land"
+    assert out.fields["land_classification"].source == "parcel_row"
+    assert out.fields["land_classification"].confidence < 70.0
+
+
+def test_classification_fallback_majority_wins():
+    text = (
+        "Schedule I Form No.39-A\n"
+        "Plot 488 8400 | 0.3399 କୃଷି\n"
+        "Plot 489 0300 | 0.0121 ଘରବାରି\n"
+        "Plot 490 0500 | 0.0202 ଘରବାରି\n"
+    )
+    out = extract_fields(text, [], profile="odisha_khatiyan_39a")
+    assert out.fields["land_classification"].normalized_value == "Homestead land"
+
+
+def test_classification_stays_missing_without_kisam():
+    text = (
+        "Schedule I Form No.39-A\n"
+        "Plot 488 8400 | 0.3399\n"
+    )
+    out = extract_fields(text, [], profile="odisha_khatiyan_39a")
+    assert out.fields["land_classification"].normalized_value == ""
