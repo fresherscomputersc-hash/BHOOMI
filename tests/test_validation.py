@@ -163,6 +163,16 @@ def test_br2_passes_when_subplots_sum(db):
     assert br2_subplot_area_sum(ctx) == []
 
 
+def test_br2_skips_identifier_free_record(db):
+    """Form 39-A plots have no khasra: empty must not match other blanks."""
+    rec = _mk_record(db, record_id="LR-NOP", khasra_no="", area_hectare=134.0)
+    _mk_record(db, record_id="LR-NOP2", khasra_no="", parent_khasra_no="",
+               area_hectare=1.0)
+    subs = [SubPlot("488", 0.3399, "hectare", 0.3399, "ev")]
+    ctx = _ctx(db, _full_fields(khasra_no=_f("", "")), record=rec, sub_plots=subs)
+    assert br2_subplot_area_sum(ctx) == []
+
+
 # BR-3 -----------------------------------------------------------------------
 def test_br3_passes_with_no_conflict(db):
     assert br3_duplicate_identifiers(_ctx(db, _full_fields(khasra_no=_f("999/9")))) == []

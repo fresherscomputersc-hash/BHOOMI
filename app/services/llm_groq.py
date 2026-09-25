@@ -106,6 +106,7 @@ def _valid_suggestion(field_name: str, value: str, profile: str) -> str:
         PATTERNS,
         PROHIBITED_BY_PROFILE,
         _inside_date,
+        _is_header_leak,
         _looks_like_name,
     )
 
@@ -117,6 +118,8 @@ def _valid_suggestion(field_name: str, value: str, profile: str) -> str:
     if not cleaned or len(cleaned) < 2:
         return ""
     if "|" in cleaned or "`" in cleaned:
+        return ""
+    if _is_header_leak(cleaned):
         return ""
     pattern = PATTERNS.get(field_name)
     if pattern:

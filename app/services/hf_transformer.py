@@ -95,6 +95,7 @@ def _valid(field_name: str, value: str, profile: str) -> str:
         PATTERNS,
         PROHIBITED_BY_PROFILE,
         _inside_date,
+        _is_header_leak,
         _looks_like_name,
     )
 
@@ -104,6 +105,8 @@ def _valid(field_name: str, value: str, profile: str) -> str:
         return ""
     cleaned = re.sub(r"\s+", " ", (value or "")).strip(" ,.:;-\t")[:200]
     if len(cleaned) < 2:
+        return ""
+    if _is_header_leak(cleaned):
         return ""
     pattern = PATTERNS.get(field_name)
     if pattern:

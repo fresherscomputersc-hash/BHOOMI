@@ -603,6 +603,62 @@ def _value_after_label(line_text: str, aliases: list[str]) -> str:
     return tail.strip(" :：-.\\t|/\u00a6\u2502")
 
 
+# Number/metadata words: a value containing these is a serial/case/office
+# number line, never a name or place ("ନମର : 262", "Tehsil Number 232").
+NUMBER_WORDS = frozenset({
+    "number", "numbers", "no", "sro",
+    "ନମ୍ବର", "ନମର", "ନଂ",
+    "संख्या", "नम्बर", "नंबर",
+    "ମୋଟ", "total", "ତାରିଖ",
+})
+
+# Instruction/prose words leaked from footers and form furniture
+# ("Cell Occluded Below" off a stress footer, never a classification).
+INSTRUCTION_WORDS = frozenset({"below", "above", "cell", "note", "n.b."})
+
+# Person-section chunks carrying these are rent/share/table prose, never a
+# person ("ଖଜଣା" rent, "ମୋଟ" total, "ବିବରଣ" statement, "ଅଣଆ/ପାହି" shares).
+PERSON_SKIP_WORDS = frozenset({
+    "ଖଜଣା", "ମୋଟ", "ବିବରଣ", "ବିବରଣି", "କହମ୍ୟ",
+    "ଅଣଆ", "ଅଣା", "ପାହି", "ପାହୁଲି",
+    "କିସମ", "ରକବା", "ଖତିୟାନ", "ମୌଜା",
+    "total", "tax", "statement", "share",
+})
+
+
+def _is_header_leak(value: str) -> bool:
+    """True when a candidate value is form furniture, not data.
+
+    A value must never contain label vocabulary: _value_after_label strips
+    the label, so any alias, praja heading word, number word or instruction
+    word left inside is a neighbouring label/header/footer that bled in
+    ("ଖତୟାନ ମୌଜା", "ର ନାମ, ଜାତି...", "ନମର : 262", "Khatanumber", "FAD").
+    """
+    v = (value or "").strip()
+    if not v:
+        return False
+    low = v.lower()
+    low_ns = re.sub(r"\s+", "", low)
+    for alias in _all_aliases():
+        if len(alias) >= 4 and alias.lower() not in {"s/o", "w/o", "d/o"} \
+                and (alias.lower() in low
+                     or alias.lower().replace(" ", "") in low_ns):
+            # Glued OCR reads ("Khatanumber") match the spaceless form.
+            return True
+    for word in list(PRAJA_HEADER_WORDS) + list(NUMBER_WORDS) + list(INSTRUCTION_WORDS):
+        if len(word) >= 2 and word.lower() in low:
+            # Latin words match on word boundaries only ("no" in "Bano" is fine).
+            if word.isascii() and not re.search(
+                    r"(?<![a-z])" + re.escape(word.lower()) + r"(?![a-z])", low):
+                continue
+            return True
+    if re.fullmatch(r"[\d\s/\-.,:;]+", v):
+        return True  # bare number run, never a name or place
+    if re.fullmatch(r"[A-Z]{2,4}", v):
+        return True  # Latin OCR fragment ("FAD"), never a real value
+    return False
+
+
 def _is_artifact_text(value: str) -> bool:
     """True for OCR debris rather than a value: table rules ("|"), stray
     backticks, runs of "=" rulers, or strings with no letters/digits at all
@@ -759,6 +815,8 @@ def _parse_praja_from(raw_lines: list[str], start: int) -> tuple[list[dict], str
     for chunk in chunks:
         if "|" in chunk or "`" in chunk:
             continue
+        if any(w in chunk.lower() for w in PERSON_SKIP_WORDS):
+            continue  # rent/share/table prose ("ଖଜଣା", "ମୋଟ", "ଅଣଆ"), never a person
         caste = ""
         caste_match = re.search(r"ଜା:\s*([^,।]+)", chunk)
         if caste_match:
@@ -880,17 +938,43 @@ def _parcel_rows_39a(raw_lines: list[str], taken: set[str] | None = None) -> lis
         area_match = re.search(r"\b(\d+\.\d+)\b", line)
         if not area_match or _inside_date(line, area_match):
             continue
-        area_value = float(area_match.group(1))
-        area_ha, _ok = to_hectare(area_value, "decimal")
+        area_str = area_match.group(1)
+        if re.fullmatch(r"\d+\.\d{3,}", area_str):
+            # Bhulekh parcel print format: hectares with decimals
+            # ("488 ... 8400 | 0.3399" = 84.00 decimal = 0.3399 ha).
+            area_value = float(area_str)
+            area_ha, area_unit = round(area_value, 6), "hectare"
+        else:
+            area_value = float(area_str)
+            area_ha, _ok = to_hectare(area_value, "decimal")
+            area_unit = "decimal"
         seen.add(plot)
         found.append(SubPlot(
             khasra_no=plot,
             area_value=area_value,
-            area_unit="decimal",
+            area_unit=area_unit,
             area_hectare=area_ha,
             evidence_text=line.strip()[:200],
         ))
     return found
+
+
+KHATIYAN_SECTION_HINT = re.compile(r"ଖତିୟାନ[^\n:]{0,24}:\s*(\d{1,6})")
+
+
+def _parcel_sections_39a(raw_lines: list[str]) -> list[list[str]]:
+    """Group parcel-page lines by khatiyan-number header.
+
+    Real Bhulekh prints pack neighbouring khatiyans on one page; only the
+    first section belongs to this document. Later sections are evidence for
+    the reviewer, never the record total.
+    """
+    sections: list[list[str]] = [[]]
+    for line in raw_lines:
+        if KHATIYAN_SECTION_HINT.search(line) and sections[-1]:
+            sections.append([])
+        sections[-1].append(line)
+    return [s for s in sections if s]
 
 
 # ---------------------------------------------------------------------------
@@ -972,6 +1056,10 @@ def extract_fields(
             elif re.fullmatch(r"[\d\s/\-.,]+", raw_value or ""):
                 # A name is never a bare number ("Tehsil : 232" is the tehsil
                 # NUMBER line, not the tehsil). Leave it missing, honestly.
+                raw_value = ""
+            elif _is_header_leak(raw_value):
+                # Neighbouring label/header/footer bled into the value
+                # ("ଖତୟାନ ମୌଜା", "ନମର : 262", "Khatanumber", "FAD").
                 raw_value = ""
         pattern = PATTERNS.get(field_name)
         pattern_strength = 0.0
@@ -1219,14 +1307,40 @@ def extract_fields(
 
     if profile == DOC_PROFILE_ODISHA_39A:
         # Odia parcel tables have no "sub plot" wording: a parcel row carries
-        # the plot number and its decimal area on the SAME line ("220 ...
-        # 19.00"). Only same-line pairs are taken - pairing across lines
-        # would be guessing. Rows the OCR fragmented stay for the reviewer.
+        # the plot number and its area on the SAME line ("488 ... 8400 |
+        # 0.3399" = 0.3399 ha; "220 ... 19.00" = 19 decimals). Only same-line
+        # pairs are taken - pairing across lines would be guessing. Rows the
+        # OCR fragmented stay for the reviewer.
         taken_numbers = {
             (dedicated.get(name).normalized_value if dedicated.get(name) else "")
             for name in ("khewat_no", "khatiyan_no", "tehsil_no")
         }
         sub_plots.extend(_parcel_rows_39a(raw_lines, taken_numbers))
+
+    # ---- Form 39-A parcel-table area fallback ------------------------------
+    # Real Khatiyan PDFs carry no "Area:" label; the parcel table is the area
+    # source. First non-empty khatiyan section only - later sections on a
+    # multi-khatiyan print belong to neighbours. Confidence stays review-bound.
+    if profile == DOC_PROFILE_ODISHA_39A and not area_field.normalized_value:
+        for section in _parcel_sections_39a(raw_lines):
+            section_rows = _parcel_rows_39a(section, taken_numbers)
+            if not section_rows:
+                continue
+            total = round(sum(r.area_hectare for r in section_rows), 6)
+            if total <= 0:
+                continue
+            area_hectare = total
+            unit_ok = True
+            area_field.value = f"{total} hectare"
+            area_field.normalized_value = str(total)
+            area_field.confidence = 62.0
+            area_field.source = "parcel_row"
+            area_field.method = "parcel_table_first_section"
+            area_field.evidence_text = "; ".join(
+                r.evidence_text for r in section_rows[:2])[:200]
+            area_field.signals["area_unit_detected"] = "hectare"
+            area_field.signals["area_hectare"] = total
+            break
 
     # ---- bare-number plot fallback (Form 39-A page 2+, header lost) --------
     # Parcel tables often lose their header in OCR while the number survives
@@ -1290,16 +1404,23 @@ def extract_fields(
                     0.5 * person["confidence"] + 0.5 * ocr_conf, 2)
         primary = owners[0]
         primary_conf = min(primary["confidence"], 69.9)
-        fields["owner_name"].value = primary["name"][:200]
-        fields["owner_name"].normalized_value = primary["name"][:200]
-        fields["owner_name"].confidence = primary_conf
-        fields["owner_name"].source = "person_parser"
-        fields["owner_name"].evidence_text = primary["name"][:200]
-        if primary["relation_type"] == "father":
-            fields["guardian_name"].value = primary["relation_name"][:200]
-            fields["guardian_name"].normalized_value = primary["relation_name"][:200]
-            fields["guardian_name"].confidence = primary_conf
-            fields["guardian_name"].source = "person_parser"
+        if _is_header_leak(primary["name"]) or (
+                primary["relation_type"] == "father"
+                and _is_header_leak(primary["relation_name"])):
+            # Parser caught form furniture, not a person - keep the label
+            # pass values (or honest missing) instead of laundering junk.
+            pass
+        else:
+            fields["owner_name"].value = primary["name"][:200]
+            fields["owner_name"].normalized_value = primary["name"][:200]
+            fields["owner_name"].confidence = primary_conf
+            fields["owner_name"].source = "person_parser"
+            fields["owner_name"].evidence_text = primary["name"][:200]
+            if primary["relation_type"] == "father":
+                fields["guardian_name"].value = primary["relation_name"][:200]
+                fields["guardian_name"].normalized_value = primary["relation_name"][:200]
+                fields["guardian_name"].confidence = primary_conf
+                fields["guardian_name"].source = "person_parser"
     boundary = parse_boundary(raw_lines)
 
     # ---- cross-field consistency pass -------------------------------------

@@ -180,8 +180,14 @@ def br2_subplot_area_sum(ctx: RecordContext) -> list[Discrepancy]:
     Two sources are checked:
       * child-plot rows read off the same register page (`ctx.sub_plots`), and
       * separately digitised child records that declare this khasra as parent.
+
+    Records without a parent identifier (Form 39-A plots) skip the rule:
+    an empty khasra would otherwise match every other identifier-free record
+    as its "child".
     """
     out: list[Discrepancy] = []
+    if not ctx.value("khasra_no"):
+        return out
     parent = round(ctx.record.area_hectare or 0.0, 6)
     if not parent:
         return out
@@ -220,6 +226,7 @@ def br2_subplot_area_sum(ctx: RecordContext) -> list[Discrepancy]:
         ctx.db.execute(
             select(LandRecord)
             .where(LandRecord.parent_khasra_no == ctx.value("khasra_no"))
+            .where(LandRecord.parent_khasra_no != "")
             .where(LandRecord.id != ctx.record.id)
             .where(LandRecord.status != RecordStatus.REJECTED)
         ).scalars().all()
