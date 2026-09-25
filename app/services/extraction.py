@@ -41,11 +41,15 @@ LABEL_ALIASES: dict[str, list[str]] = {
         "ଖାତିଆନ ନମ୍ବର", "ଖାତିଆନ", "ଖେୱାଟ",
     ],
     "survey_no": ["survey no", "survey number", "survey", "s no", "सर्वे नम्बर", "ଜରିପ ନମ୍ବର"],
-    "plot_no": ["plot no", "plot number", "plot", "plata", "दाग", "ଦାଗ", "ପ୍ଲଟ"],
+    "plot_no": ["plot no", "plot number", "plot", "plata", "दाग", "ଦାଗ", "ପ୍ଲଟ",
+                "gata", "gata number", "gata no", "गाटा", "गाटा संख्या", "गाटा नम्बर"],
     "village": [
-        "village", "vill", "mouza", "গ্রাম", "ग्राम", "गाँव", "ଗ୍ରାମ", "ମୌଜା",
+        "village", "vill", "mouza", "mauza", "ग्राम", "गाँव", "ଗ୍ରାମ", "ମୌଜା",
+        "मौजा",
     ],
-    "tehsil": ["tehsil", "tahsil", "taluka", "block", "tashil", "तहसील", "ତହସିଲ", "ବ୍ଲକ"],
+    "tehsil": ["tehsil", "tahsil", "taluka", "block", "tashil", "तहसील", "ତହସିଲ", "ବ୍ଲକ",
+               "pargana", "परगना", "anchal", "अंचल", "circle", "सर्कल",
+               "subdivision", "sub division", "अनुमंडल"],
     "district": ["district", "zilla", "janpad", "जिला", "जनपद", "ଜିଲ୍ଲା"],
     "owner_name": [
         "owner name", "name of owner", "owner", "khatedar", "record holder",
@@ -59,9 +63,14 @@ LABEL_ALIASES: dict[str, list[str]] = {
     ],
     "guardian_name": [
         "father name", "father's name", "guardian", "s/o", "son of", "w/o",
-        "पिता का नाम", "पिता", "ପିତାଙ୍କ ନାମ", "ପିତା",
+        "mother name", "mother", "m/o", "husband name", "husband", "h/o",
+        "d/o", "daughter of", "c/o",
+        "पिता का नाम", "पिता", "माता का नाम", "माता", "पति का नाम", "पति",
+        "पुत्र का नाम", "पुत्र",
+        "ପିତାଙ୍କ ନାମ", "ପିତା",
     ],
-    "address": ["address", "residence", "at/po", "पता", "ଠିକଣା"],
+    "address": ["address", "residence", "at/po", "पता", "ଠିକଣା",
+                "निवासी", "मकान", "house no", "house number"],
     "area": [
         "area", "total area", "plot area", "land area", "extent", "rakaba",
         "क्षेत्रफल", "कुल क्षेत्रफल", "रकबा",
@@ -120,6 +129,10 @@ SECONDARY_LABEL_WORDS = {
 # ---------------------------------------------------------------------------
 DOC_PROFILE_GENERIC = "generic"
 DOC_PROFILE_ODISHA_39A = "odisha_khatiyan_39a"
+DOC_PROFILE_UP_KHATAUNI = "up_khatauni"
+DOC_PROFILE_MP_KHASRA = "mp_khasra"
+DOC_PROFILE_BIHAR_KHATIYAN = "bihar_khatiyan"
+DOC_PROFILE_RAJ_JAMABANDI = "rajasthan_jamabandi"
 
 FORM_39A_MARKERS = ("form no.39-a", "form no 39-a", "form no. 39", "39-a")
 
@@ -135,6 +148,22 @@ PROHIBITED_BY_PROFILE: dict[str, set[str]] = {
         "previous_owner",   # never inferred from the person list
         "new_owner",        # never inferred without explicit evidence
     },
+    DOC_PROFILE_UP_KHATAUNI: {
+        "khasra_no",        # UP khatauni uses Gata (plot_no), not Khasra
+        "survey_no",        # no Survey field in UP
+    },
+    DOC_PROFILE_MP_KHASRA: {
+        "survey_no",        # MP khasra has no Survey field
+        "plot_no",          # MP uses Khasra, not Plot
+    },
+    DOC_PROFILE_BIHAR_KHATIYAN: {
+        "survey_no",        # Bihar uses Khata/Khesra, not Survey
+        "plot_no",          # Bihar uses Khesra (≈khasra_no), not Plot
+    },
+    DOC_PROFILE_RAJ_JAMABANDI: {
+        "survey_no",        # Rajasthan jamabandi uses Khasra, not Survey
+        "plot_no",          # ... and not Plot
+    },
 }
 
 # Mandatory-field sets per document type (BR-1 reads this, not the flat list).
@@ -145,6 +174,12 @@ def required_fields_for(doc_type_label: str) -> list[str]:
     """Mandatory fields for a document type (SRS FR-6, BR-1)."""
     if doc_type_label == "odisha_khatiyan_39a":
         return ["owner_name", "plot_no", "village", "tehsil", "district",
+                "area", "land_classification"]
+    if doc_type_label == "up_khatauni":
+        return ["owner_name", "khata_no", "plot_no", "village", "tehsil",
+                "district", "area", "land_classification"]
+    if doc_type_label in ("mp_khasra", "bihar_khatiyan", "rajasthan_jamabandi"):
+        return ["owner_name", "khasra_no", "village", "tehsil", "district",
                 "area", "land_classification"]
     return list(REQUIRED_FIELDS)
 
@@ -158,6 +193,27 @@ def detect_profile(text: str) -> str:
         return DOC_PROFILE_ODISHA_39A
     if "khewat" in lowered and "khatiyan" in lowered and "mouza" in lowered:
         return DOC_PROFILE_ODISHA_39A
+    # Hindi-belt forms: state word gates the assignment so "jamabandi"
+    # (Bihar + Rajasthan) and "khasra" (MP + generic) never cross over.
+    has_up = ("uttar pradesh" in lowered or "उत्तर प्रदेश" in lowered
+              or "khatauni" in lowered or "खतौनी" in lowered)
+    has_mp = ("madhya pradesh" in lowered or "मध्य प्रदेश" in lowered
+              or "patwari" in lowered or "पटवारी" in lowered)
+    has_bihar = ("bihar" in lowered or "बिहार" in lowered or "anchal" in lowered
+                 or "अंचल" in lowered)
+    has_raj = ("rajasthan" in lowered or "राजस्थान" in lowered)
+    if has_up and ("khatauni" in lowered or "खतौनी" in lowered
+                   or "gata" in lowered or "गाटा" in lowered):
+        return DOC_PROFILE_UP_KHATAUNI
+    if has_mp and ("khasra" in lowered or "खसरा" in lowered):
+        return DOC_PROFILE_MP_KHASRA
+    if has_bihar and ("jamabandi" in lowered or "जमाबंदी" in lowered
+                      or "khatiyan" in lowered or "khesra" in lowered
+                      or "खेसरा" in lowered):
+        return DOC_PROFILE_BIHAR_KHATIYAN
+    if has_raj and ("jamabandi" in lowered or "जमाबंदी" in lowered
+                    or "khasra" in lowered or "खसरा" in lowered):
+        return DOC_PROFILE_RAJ_JAMABANDI
     return DOC_PROFILE_GENERIC
 
 
@@ -261,6 +317,8 @@ NAME_STOPWORDS = {
     "the", "of", "and", "s/o", "w/o", "d/o", "no", "date", "khasra", "khata",
     "village", "tehsil", "district", "area", "acre", "owner", "name", "father",
     "at", "po", "ps", "mouza", "total", "plot", "survey", "classification",
+    "shri", "shree", "smt", "sushri", "sri", "late", "swargiya", "mr", "mrs",
+    "husband", "wife", "son", "daughter", "mother",
 }
 
 DATE_HINT = re.compile(r"\d{1,2}[/-]\d{1,2}[/-]\d{2,4}|\d{4}-\d{2}-\d{2}")
@@ -1116,9 +1174,14 @@ def extract_fields(
             # table rows leave the next cell's identifier glued to the name
             # ("Late Balaram Sahoo 123/4") - drop a trailing plot/area number.
             raw_value = re.sub(r"\s+\d{1,4}(?:/\d{1,3})?(?:\s+\d+(?:\.\d+)?)?\s*$", "", raw_value)
-            if field_name == "guardian_name":
-                # "S/o Late Balaram Sahoo" -> the relation prefix is the label
-                raw_value = re.sub(r"^(s/o|w/o|d/o|c/o)\s+", "", raw_value, flags=re.IGNORECASE)
+            # Relation prefixes and honorifics are the label, not the name
+            # ("S/o Late Balaram Sahoo", "श्री रमेश चंद्र").
+            raw_value = re.sub(
+                r"^(s/o|w/o|d/o|c/o|h/o|m/o)\s+", "", raw_value, flags=re.IGNORECASE)
+            raw_value = re.sub(
+                r"^(shri|shree|smt|sushri|sri|late|swargiya|mr|mrs|"
+                r"श्री|श्रीमती|सुश्री|स्व|स्वर्गीय|मृतक)\.?\s+",
+                "", raw_value, flags=re.IGNORECASE)
             ok, name_score = _looks_like_name(raw_value)
             if not ok:
                 # A name field that does not read like a name is layout noise
@@ -1578,6 +1641,9 @@ def classify_document_type(outcome: ExtractionOutcome) -> tuple[str, float]:
             or ("ଖତିୟାନ" in heading and "ଖେୱାଟ" in blob)
             or ("khatiyan" in heading and "khewat" in blob)):
         return "odisha_khatiyan_39a", 0.9
+    hindi_profile = detect_profile(heading + "\n" + blob)
+    if hindi_profile != DOC_PROFILE_GENERIC:
+        return hindi_profile, 0.88
     if "record of rights" in heading or "khatian" in heading or "ଖାତିଆନ" in heading or "(ror)" in heading:
         return "record_of_rights", 0.93
     if "mutation register" in heading or "दाखिल" in heading or "ନାମାନ୍ତରଣ" in heading:

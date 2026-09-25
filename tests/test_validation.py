@@ -255,6 +255,14 @@ def test_br7_fires_on_hierarchy_mismatch(db):
     assert any("belongs to tehsil" in d.message for d in out)
 
 
+def test_br7_out_of_scope_is_low_not_medium(db):
+    fields = _full_fields(village=_f("Janakpur"), district=_f("Kendrapara"))
+    out = br7_admin_hierarchy(_ctx(db, fields))
+    assert out
+    assert all(d.severity == "low" for d in out)
+    assert any("outside the loaded" in d.message for d in out)
+
+
 # BR-8 -----------------------------------------------------------------------
 def test_br8_passes_with_no_neighbours(db):
     assert br8_owner_fuzzy_match(_ctx(db, _full_fields())) == []

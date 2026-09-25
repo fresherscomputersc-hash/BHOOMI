@@ -515,6 +515,11 @@ def br7_admin_hierarchy(ctx: RecordContext) -> list[Discrepancy]:
     district = ctx.value("district")
     result = master_data.lookup_village(village, tehsil)
     out: list[Discrepancy] = []
+    canonical_district = master_data.canonical_district(district)
+    out_of_scope = bool(
+        canonical_district
+        and canonical_district.strip().lower() != master_data.DISTRICT.lower()
+    )
 
     if result["status"] == "hierarchy_mismatch":
         out.append(Discrepancy(
@@ -532,14 +537,30 @@ def br7_admin_hierarchy(ctx: RecordContext) -> list[Discrepancy]:
             recommended_action="Correct the tehsil/block to the value in the LGD master data.",
         ))
     elif result["status"] == "not_in_master":
-        out.append(Discrepancy(
-            rule_id="BR-7", rule_name=RULE_BY_ID["BR-7"]["name"], severity="medium",
-            message=f"Village '{village}' is not present in the {master_data.DISTRICT} administrative master.",
-            expected="a village listed in the LGD master", actual=village,
-            conflicting_values={"village": village, "master_source": "LGD demo subset"},
-            evidence_refs=_evidence_for(ctx, "village"),
-            recommended_action="Check spelling (OCR may have corrupted the name) or confirm the district scope.",
-        ))
+        if out_of_scope:
+            # Multi-state document against a single-district demo master:
+            # route for review, don't fail what was never loaded.
+            out.append(Discrepancy(
+                rule_id="BR-7", rule_name=RULE_BY_ID["BR-7"]["name"], severity="low",
+                message=(
+                    f"Village '{village}' is outside the loaded {master_data.DISTRICT} "
+                    f"master (district '{district}'); verify against that district's master."
+                ),
+                expected="a village listed in the district master", actual=village,
+                conflicting_values={"village": village, "stated_district": district,
+                                    "master_source": "LGD demo subset"},
+                evidence_refs=_evidence_for(ctx, "village"),
+                recommended_action="Verify against the stated district's master data.",
+            ))
+        else:
+            out.append(Discrepancy(
+                rule_id="BR-7", rule_name=RULE_BY_ID["BR-7"]["name"], severity="medium",
+                message=f"Village '{village}' is not present in the {master_data.DISTRICT} administrative master.",
+                expected="a village listed in the LGD master", actual=village,
+                conflicting_values={"village": village, "master_source": "LGD demo subset"},
+                evidence_refs=_evidence_for(ctx, "village"),
+                recommended_action="Check spelling (OCR may have corrupted the name) or confirm the district scope.",
+            ))
     canonical_district = master_data.canonical_district(district)
     if canonical_district and canonical_district.strip().lower() != master_data.DISTRICT.lower():
         out.append(Discrepancy(

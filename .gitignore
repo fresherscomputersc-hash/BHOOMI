@@ -11,6 +11,9 @@ GROQ_API_KEY*
 data/uploads/
 data/processed/
 data/samples/
+data/stress/
+data/stress_hindi/
+data/stress_english/
 data/geojson/
 data/reports/
 bhuverify-key.pem

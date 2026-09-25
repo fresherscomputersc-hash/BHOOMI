@@ -164,3 +164,43 @@ def test_classification_stays_missing_without_kisam():
     )
     out = extract_fields(text, [], profile="odisha_khatiyan_39a")
     assert out.fields["land_classification"].normalized_value == ""
+
+
+def test_hindi_profiles_detected():
+    from app.services.extraction import detect_profile, required_fields_for
+    assert detect_profile("उत्तर प्रदेश खतौनी गाटा संख्या") == "up_khatauni"
+    assert detect_profile("मध्य प्रदेश खसरा पटवारी") == "mp_khasra"
+    assert detect_profile("बिहार जमाबंदी अंचल") == "bihar_khatiyan"
+    assert detect_profile("राजस्थान जमाबंदी खसरा") == "rajasthan_jamabandi"
+    assert detect_profile("Record of Rights") == "generic"
+    assert "plot_no" in required_fields_for("up_khatauni")
+    assert "khasra_no" in required_fields_for("mp_khasra")
+    assert "khasra_no" not in required_fields_for("up_khatauni")
+
+
+def test_gata_maps_to_plot_no():
+    out = extract_fields("गाटा संख्या 118\nग्राम रामपुर", [], profile="up_khatauni")
+    assert out.fields["plot_no"].normalized_value == "118"
+
+
+def test_anchal_maps_to_tehsil():
+    out = extract_fields("अंचल बिहारशरीफ\nजिला नालंदा", [], profile="bihar_khatiyan")
+    assert out.fields["tehsil"].normalized_value == "बिहारशरीफ"
+
+
+def test_honorific_stripped_from_owner():
+    out = extract_fields("खातेदार का नाम श्री रमेश कुमार", [], profile="up_khatauni")
+    assert out.fields["owner_name"].normalized_value == "रमेश कुमार"
+
+
+def test_pati_alias_fills_guardian():
+    out = extract_fields("पति का नाम मोहन प्रसाद", [], profile="bihar_khatiyan")
+    assert out.fields["guardian_name"].normalized_value == "मोहन प्रसाद"
+
+
+def test_khatauni_classifier_label():
+    from app.services import extraction as ext
+    out = ext.extract_fields(
+        "उत्तर प्रदेश खतौनी\nगाटा संख्या 118\nग्राम रामपुर", [], profile="up_khatauni")
+    doc_type, _c = ext.classify_document_type(out)
+    assert doc_type == "up_khatauni"
