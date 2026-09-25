@@ -15,7 +15,11 @@
 spacy>=3.7,<4
 
 # --- Hugging Face transformers (local NER + TrOCR, CPU) ----------------------
-transformers>=4.40
+# Pinned <5: transformers 5.x mis-loads XLM-R sentencepiece tokenizers
+# (tiktoken loader on .bpe.model). v4 is proven with XLM-R + Indic models.
+transformers>=4.40,<5
+protobuf>=5            # v4-era protobuf breaks on Python 3.14 (HF warm-up)
 torch>=2.2
 Pillow>=10         # TrOCR image processor (already via requirements.txt Pillow)
 sentencepiece>=0.1 # XLM-R / Indic tokenizers
+tiktoken>=0.7      # required by some HF tokenizers (transformers>=5)
