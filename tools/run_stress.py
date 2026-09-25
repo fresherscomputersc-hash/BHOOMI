@@ -51,8 +51,18 @@ def upload(token: str, path: str) -> dict:
                headers={"Content-Type": "multipart/form-data; boundary=" + boundary})
 
 
-def summarize(token: str, doc_id: str) -> dict:
+def summarize(token: str, doc_id: str, timeout_s: int = 900) -> dict:
+    import time as _time
     detail = api("GET", f"/api/v1/documents/{doc_id}", token=token)
+    # Reprocess POSTs return before the worker settles: poll to a terminal
+    # state first, otherwise we report the previous run's record.
+    _t0 = _time.time()
+    while detail.get("status") in ("queued", "preprocessing", "ocr_running",
+                                   "extracting", "validating"):
+        if _time.time() - _t0 > timeout_s:
+            break
+        _time.sleep(10)
+        detail = api("GET", f"/api/v1/documents/{doc_id}", token=token)
     out = {
         "doc_id": doc_id,
         "file": detail.get("original_filename"),

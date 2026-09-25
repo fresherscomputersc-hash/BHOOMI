@@ -30,3 +30,9 @@ def test_odia_majority_routes_ori():
     page = {"text": "ଖତିୟାନ", "words": _words(*(["Odia"] * 5 + ["Latin"] * 2)),
             "language": "eng+hin+ori"}
     assert second_pass_language(page, "generic") == "ori"
+
+
+def test_hindi_profile_routes_hin_despite_garbage_tags():
+    page = {"text": "जगाबंदी", "words": _words(*(["Odia"] * 5 + ["Latin"] * 2)),
+            "language": "eng+hin+ori"}
+    assert second_pass_language(page, "bihar_khatiyan") == "hin"

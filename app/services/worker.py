@@ -69,13 +69,18 @@ def second_pass_language(page_ocr: dict, doc_profile: str) -> str:
     """Dedicated single-script OCR language for a page, "" when unneeded.
 
     The combined eng+hin+ori pass under-reads Indic scripts, so a
-    profile-routed (39-A -> ori) or script-majority (Devanagari -> hin,
-    Odia -> ori) page gets one extra pass. Latin pages pay nothing.
+    profile-routed page (39-A/Hindi-belt profiles imply their script) or a
+    script-majority page (Devanagari -> hin, Odia -> ori) gets one extra
+    pass. Latin pages pay nothing. Profile routing matters because script
+    tags on garbage OCR can point the wrong way.
     """
     from app.services.extraction import detect_profile as _detect_profile
 
     if doc_profile == "odisha_khatiyan_39a":
         return "ori"
+    if doc_profile in ("up_khatauni", "mp_khasra", "bihar_khatiyan",
+                       "rajasthan_jamabandi"):
+        return "hin"
     if _detect_profile(page_ocr.get("text", "")) == "odisha_khatiyan_39a":
         return "ori"
     scripts: dict[str, int] = {}
