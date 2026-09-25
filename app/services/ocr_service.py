@@ -291,7 +291,14 @@ def run_htr(image_path: str | Path, language: str | None = None) -> OcrResult:
         raise ValueError(f"HTR could not read image: {image_path}")
 
     h, w = image.shape[:2]
-    scale = max(1.0, 1200.0 / float(h))
+    if h < 8 or w < 8:
+        empty = OcrResult(text="", language=language, mode="handwritten",
+                          psm=7, engine="tesseract+htr-pipeline")
+        empty.warnings.append("HTR crop degenerate; routed to human review")
+        return empty
+    # Cap the upscale so a sliver crop never explodes into a gigapixel
+    # image ("Image too large" TesseractError on ENG-2's stamp sliver).
+    scale = max(1.0, min(1200.0 / float(h), 6000.0 / float(max(w, h))))
     if scale > 1.0:
         image = cv2.resize(image, (int(w * scale), int(h * scale)), interpolation=cv2.INTER_CUBIC)
     image = cv2.bilateralFilter(image, 7, 45, 45)

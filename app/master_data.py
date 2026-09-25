@@ -185,9 +185,10 @@ def canonical_classification(raw: str) -> str:
     key = raw.strip().lower()
     if key in CLASSIFICATION_ALIASES:
         return CLASSIFICATION_ALIASES[key]
-    for alias, canonical in CLASSIFICATION_ALIASES.items():
+    # Longest alias first: "unirrigated" must win over "irrigated" inside it.
+    for alias in sorted(CLASSIFICATION_ALIASES, key=len, reverse=True):
         if alias in key:
-            return canonical
+            return CLASSIFICATION_ALIASES[alias]
     for canonical in LAND_CLASSIFICATIONS:
         if canonical.lower() in key:
             return canonical

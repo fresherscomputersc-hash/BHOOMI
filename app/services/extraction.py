@@ -214,6 +214,35 @@ def detect_profile(text: str) -> str:
     if has_raj and ("jamabandi" in lowered or "जमाबंदी" in lowered
                     or "khasra" in lowered or "खसरा" in lowered):
         return DOC_PROFILE_RAJ_JAMABANDI
+    # Fuzzy fallback: OCR garbles short form words ("जमाबंदी" -> "जगाबंदी")
+    # while long state words usually survive. rapidfuzz is already a
+    # dependency; threshold 84 keeps fragments like "GAD"/"FAD" out.
+    try:
+        from rapidfuzz import fuzz as _fuzz
+
+        heading = lowered.splitlines()[:6]
+
+        def _near(*cands: str) -> bool:
+            return any(_fuzz.partial_ratio(ln, cand) >= 84
+                       for ln in heading for cand in cands)
+
+        up_state = ("uttar pradesh" in lowered or "उत्तर प्रदेश" in lowered)
+        mp_state = ("madhya pradesh" in lowered or "मध्य प्रदेश" in lowered
+                    or "patwari" in lowered or "पटवारी" in lowered)
+        bihar_state = ("bihar" in lowered or "बिहार" in lowered
+                       or "anchal" in lowered or "अंचल" in lowered)
+        raj_state = ("rajasthan" in lowered or "राजस्थान" in lowered)
+        if up_state and _near("khatauni", "खतौनी", "gata", "गाटा"):
+            return DOC_PROFILE_UP_KHATAUNI
+        if mp_state and _near("khasra", "खसरा"):
+            return DOC_PROFILE_MP_KHASRA
+        if bihar_state and _near("jamabandi", "जमाबंदी", "khatiyan",
+                                 "khesra", "खेसरा"):
+            return DOC_PROFILE_BIHAR_KHATIYAN
+        if raj_state and _near("jamabandi", "जमाबंदी", "khasra", "खसरा"):
+            return DOC_PROFILE_RAJ_JAMABANDI
+    except Exception:
+        pass
     return DOC_PROFILE_GENERIC
 
 
@@ -673,7 +702,21 @@ NUMBER_WORDS = frozenset({
 
 # Instruction/prose words leaked from footers and form furniture
 # ("Cell Occluded Below" off a stress footer, never a classification).
-INSTRUCTION_WORDS = frozenset({"below", "above", "cell", "note", "n.b."})
+INSTRUCTION_WORDS = frozenset({"below", "above", "cell", "note", "n.b.",
+                               "line", "deliberately", "absent"})
+
+# Document-type and state words: a VALUE containing these is a heading that
+# bled in, never data ("RoR" as guardian, "Odisha"/"उत्तर प्रदेश" as village,
+# "जगाबंदी"-style OCR-mangled headings as district).
+DOC_WORDS = frozenset({
+    "ror", "record of rights", "jamabandi", "जमाबंदी", "जगाबंदी",
+    "khatiyan", "खतियान", "खतौनी",
+    "ଖତିୟାନ", "ଖତୟାନ", "ଖାତିଆନ",
+    "mutation", "namantaran", "sale deed", "khatian",
+    "uttar pradesh", "उत्तर प्रदेश", "madhya pradesh", "मध्य प्रदेश",
+    "bihar", "बिहार", "rajasthan", "राजस्थान", "odisha", "orissa",
+    "ओडिशा", "pradesh", "प्रदेश",
+})
 
 # Person-section chunks carrying these are rent/share/table prose, never a
 # person ("ଖଜଣା" rent, "ମୋଟ" total, "ବିବରଣ" statement, "ଅଣଆ/ପାହି" shares).
@@ -704,13 +747,16 @@ def _is_header_leak(value: str) -> bool:
                      or alias.lower().replace(" ", "") in low_ns):
             # Glued OCR reads ("Khatanumber") match the spaceless form.
             return True
-    for word in list(PRAJA_HEADER_WORDS) + list(NUMBER_WORDS) + list(INSTRUCTION_WORDS):
-        if len(word) >= 2 and word.lower() in low:
-            # Latin words match on word boundaries only ("no" in "Bano" is fine).
-            if word.isascii() and not re.search(
-                    r"(?<![a-z])" + re.escape(word.lower()) + r"(?![a-z])", low):
-                continue
-            return True
+    for word in list(PRAJA_HEADER_WORDS) + list(NUMBER_WORDS) \
+            + list(INSTRUCTION_WORDS) + list(DOC_WORDS):
+        if len(word) < 2:
+            continue
+        # Word-boundary match only: "bihar" must not fire inside
+        # "Biharsharif", "no" must not fire inside "Bano". \w covers
+        # Indic scripts too (letters are word characters).
+        if not re.search(r"(?<!\w)" + re.escape(word.lower()) + r"(?!\w)", low):
+            continue
+        return True
     if re.fullmatch(r"[\d\s/\-.,:;]+", v):
         return True  # bare number run, never a name or place
     if re.fullmatch(r"[A-Z]{2,4}", v):
@@ -1295,6 +1341,8 @@ def extract_fields(
             match = None  # a DD/MM/YYYY fragment, not an identifier
         if match:
             value = match.group(match.lastindex)
+            if field_name == "mutation_no" and not re.search(r"\d", value):
+                continue  # "ation" off "Mutation Date" is a word fragment
             ocr_conf, bbox = _ocr_confidence_for(value, words)
             fields[field_name] = FieldExtraction(
                 field_name=field_name,

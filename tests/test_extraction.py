@@ -204,3 +204,47 @@ def test_khatauni_classifier_label():
         "उत्तर प्रदेश खतौनी\nगाटा संख्या 118\nग्राम रामपुर", [], profile="up_khatauni")
     doc_type, _c = ext.classify_document_type(out)
     assert doc_type == "up_khatauni"
+
+
+def test_canonical_longest_alias_wins():
+    from app.master_data import canonical_classification
+    assert canonical_classification("Unirrigated land") == "Unirrigated land"
+    assert canonical_classification("Irrigated land") == "Irrigated land"
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [
+        ("RoR", True),
+        ("Odisha", True),
+        ("उत्तर प्रदेश", True),
+        ("जगाबंदी", True),
+        ("line deliberately absen", True),
+        ("Biharsharif", False),
+        ("Bhubaneswar", False),
+    ],
+)
+def test_doc_word_leaks(value, expected):
+    assert _is_header_leak(value) is expected
+
+
+def test_mutation_sweep_rejects_word_fragment():
+    out = extract_fields("Mutation Date 05/06/2021", [], profile="generic")
+    assert out.fields["mutation_no"].normalized_value == ""
+
+
+def test_fuzzy_profile_survives_mangled_heading():
+    from app.services.extraction import detect_profile
+    assert detect_profile("बिहार\nजगाबंदी\nअंचल") == "bihar_khatiyan"
+    assert detect_profile("Record GAD FAD") == "generic"
+
+
+def test_htr_degenerate_crop_returns_gracefully(tmp_path):
+    from PIL import Image
+
+    from app.services import ocr_service
+    tiny = tmp_path / "sliver.png"
+    Image.new("L", (200, 4), 128).save(tiny)
+    result = ocr_service.run_htr(str(tiny))
+    assert result.words == []
+    assert result.warnings
