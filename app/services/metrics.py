@@ -16,6 +16,7 @@ from app.models import (
     CorrectionDataset,
     Discrepancy,
     DocumentStatus,
+    ExtractionResult,
     LandRecord,
     RecordStatus,
     Severity,
@@ -101,6 +102,53 @@ def dashboard(db: Session) -> dict:
                    .group_by(CorrectionDataset.field_name)).all()
     )
     fields_corrected = len(corrected_fields)
+    top_corrected = db.execute(
+        select(CorrectionDataset.field_name, func.count(CorrectionDataset.id))
+        .group_by(CorrectionDataset.field_name)
+        .order_by(func.count(CorrectionDataset.id).desc())
+        .limit(5)
+    ).all()
+
+    # Measured accuracy: reviewer corrections against extracted fields.
+    # Estimated (confidence) is a forecast; this is the observed score.
+    extracted_total = db.execute(
+        select(func.count(ExtractionResult.id))
+        .where(ExtractionResult.normalized_value != "")
+    ).scalar() or 0
+    measured_accuracy = (
+        round(100.0 * (1.0 - corrections / extracted_total), 1)
+        if extracted_total else None
+    )
+    band_rows = dict(
+        db.execute(
+            select(
+                case(
+                    (ExtractionResult.confidence >= 90.0, "high"),
+                    (ExtractionResult.confidence >= 70.0, "medium"),
+                    else_="low",
+                ),
+                func.count(ExtractionResult.id),
+            )
+            .where(ExtractionResult.normalized_value != "")
+            .group_by(
+                case(
+                    (ExtractionResult.confidence >= 90.0, "high"),
+                    (ExtractionResult.confidence >= 70.0, "medium"),
+                    else_="low",
+                )
+            )
+        ).all()
+    )
+    error_fields = db.execute(
+        select(ExtractionResult.field_name, func.count(ExtractionResult.id))
+        .where(ExtractionResult.is_low_confidence.is_(True))
+        .group_by(ExtractionResult.field_name)
+        .order_by(func.count(ExtractionResult.id).desc())
+        .limit(8)
+    ).all()
+    resolved = db.execute(
+        select(func.count(Discrepancy.id)).where(Discrepancy.status != "open")
+    ).scalar() or 0
 
     audit_events = db.execute(select(func.count(AuditLog.id))).scalar() or 0
 
@@ -113,6 +161,20 @@ def dashboard(db: Session) -> dict:
     tehsil_rows = db.execute(
         select(LandRecord.tehsil, func.count(LandRecord.id))
         .group_by(LandRecord.tehsil)
+        .order_by(func.count(LandRecord.id).desc())
+    ).all()
+    state_rows = db.execute(
+        select(LandRecord.state, func.count(LandRecord.id))
+        .group_by(LandRecord.state)
+        .order_by(func.count(LandRecord.id).desc())
+    ).all()
+    district_verified = db.execute(
+        select(
+            LandRecord.district,
+            func.count(LandRecord.id),
+            func.sum(case((LandRecord.status == RecordStatus.APPROVED, 1), else_=0)),
+        )
+        .group_by(LandRecord.district)
         .order_by(func.count(LandRecord.id).desc())
     ).all()
 
@@ -158,6 +220,16 @@ def dashboard(db: Session) -> dict:
             "average_record_confidence": round(float(avg_confidence), 2),
             "low_confidence_records": low_confidence_records,
             "estimated_accuracy_pct": round(float(avg_confidence), 1),
+            "measured_accuracy_pct": measured_accuracy,
+            "extracted_fields": extracted_total,
+            "confidence_bands": {
+                "high": band_rows.get("high", 0),
+                "medium": band_rows.get("medium", 0),
+                "low": band_rows.get("low", 0),
+            },
+            "top_corrected_fields": [
+                {"field": f, "corrections": c} for f, c in top_corrected
+            ],
             "gis_linked_records": gis_linked,
             "gis_link_rate_pct": _pct(gis_linked, records_total),
         },
@@ -171,9 +243,13 @@ def dashboard(db: Session) -> dict:
         "validation": {
             "discrepancies_total": discrepancies_total,
             "discrepancies_open": open_discrepancies,
+            "discrepancies_resolved": resolved,
             "high_and_critical": high_severity,
             "by_severity": by_severity,
             "rule_wise": rule_wise,
+            "top_error_fields": [
+                {"field": f, "low_confidence": c} for f, c in error_fields
+            ],
         },
         "learning": {
             "corrections_captured": corrections,
@@ -185,6 +261,12 @@ def dashboard(db: Session) -> dict:
             "review_completion_pct": _pct(approved + rejected, records_total),
             "by_district": [{"district": d or "(unmapped)", "records": c} for d, c in district_rows],
             "by_tehsil": [{"tehsil": t or "(unmapped)", "records": c} for t, c in tehsil_rows],
+            "by_state": [{"state": s or "(unmapped)", "records": c} for s, c in state_rows],
+            "district_verified": [
+                {"district": d or "(unmapped)", "records": c,
+                 "verified_pct": _pct(v or 0, c)}
+                for d, c, v in district_verified
+            ],
             "reviewer_workload": [
                 {"user_id": uid, "pending": count} for uid, count in workload
             ],

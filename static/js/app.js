@@ -363,12 +363,13 @@
       statCard("Avg extraction confidence", pct(data.extraction.average_record_confidence),
         num(data.extraction.low_confidence_records) + " record(s) below 70%",
         data.extraction.average_record_confidence >= 80 ? "good" : "warn"),
+      statCard("Measured accuracy", data.extraction.measured_accuracy_pct === null ? "—" : pct(data.extraction.measured_accuracy_pct),
+        num(data.extraction.extracted_fields) + " fields scored · " + num(data.learning.corrections_captured) + " corrected",
+        data.extraction.measured_accuracy_pct === null || data.extraction.measured_accuracy_pct >= 80 ? "good" : "warn"),
       statCard("GIS-linked records", num(data.extraction.gis_linked_records), pct(data.extraction.gis_link_rate_pct) + " of records", null),
       statCard("Avg pipeline latency", (data.performance.average_pipeline_latency_ms / 1000).toFixed(2) + " s",
         "budget " + (data.performance.budget_ms / 1000) + " s per document",
         data.performance.within_budget ? "good" : "bad"),
-      statCard("Corrections captured", num(data.learning.corrections_captured),
-        num(data.learning.distinct_fields_corrected) + " distinct fields", null),
     ]));
 
     // rule-wise discrepancies
@@ -395,6 +396,47 @@
                 barRow(t.tehsil, t.records, Math.max(...data.progress.by_tehsil.map((x) => x.records)))))
             : el("div", { class: "empty" }, ["No records yet."]),
         ]),
+    ]));
+
+    // accuracy: forecast vs observed + error fields
+    const bands = data.extraction.confidence_bands || { high: 0, medium: 0, low: 0 };
+    const bandMax = Math.max(1, bands.high || 0, bands.medium || 0, bands.low || 0);
+    const errFields = data.validation.top_error_fields || [];
+    const errMax = errFields.length ? Math.max(...errFields.map((e) => e.low_confidence)) : 1;
+    const states = data.progress.by_state || [];
+    const stateMax = states.length ? Math.max(...states.map((x) => x.records)) : 1;
+    const distVer = data.progress.district_verified || [];
+    const distMax = distVer.length ? Math.max(...distVer.map((x) => x.records)) : 1;
+    wrap.appendChild(el("div", { class: "grid cols-2" }, [
+      panel("Extraction accuracy: forecast vs observed",
+        data.extraction.measured_accuracy_pct === null
+          ? "Forecast from confidence. Observed score appears after reviewers correct fields."
+          : "Observed = fields reviewers left untouched. Corrected: " +
+            (data.extraction.top_corrected_fields || []).map((f) => f.field + " ×" + f.corrections).join(", "),
+        [
+          barRow("high confidence (90+)", bands.high || 0, bandMax, "good"),
+          barRow("medium (70-89)", bands.medium || 0, bandMax, "warn"),
+          barRow("low (<70)", bands.low || 0, bandMax, (bands.low || 0) ? "bad" : ""),
+        ]),
+      panel("Top low-confidence fields",
+        "Where extraction struggles - the training-data shopping list.",
+        [errFields.length
+          ? el("div", {}, errFields.map((e) => barRow(e.field, e.low_confidence, errMax, "warn")))
+          : el("div", { class: "empty" }, ["No low-confidence fields."])]),
+    ]));
+    wrap.appendChild(el("div", { class: "grid cols-2" }, [
+      panel("State-wise digitization progress", null, [
+        states.length
+          ? el("div", {}, states.map((s) => barRow(s.state, s.records, stateMax)))
+          : el("div", { class: "empty" }, ["No records yet."]),
+      ]),
+      panel("District verified share", "Approved ÷ total per district.", [
+        distVer.length
+          ? el("div", {}, distVer.slice(0, 10).map((d) =>
+              barRow(d.district + " " + d.verified_pct.toFixed(1) + "%", d.records, distMax,
+                d.verified_pct >= 80 ? "good" : "")))
+          : el("div", { class: "empty" }, ["No records yet."]),
+      ]),
     ]));
 
     // severity split + document status
