@@ -383,8 +383,14 @@ def process_document(document_id: int) -> dict:
             document.ocr_engine = ocr["engine"]
             document.ocr_language = ocr["language"]
             document.ocr_latency_ms = int((time.perf_counter() - ocr_started) * 1000)
-            document.preprocessing_stats["handwritten_regions"] = ocr["handwritten_regions"]
-            document.preprocessing_stats["pages"] = len(page_pres)
+            # Full-dict reassign: SQLAlchemy does not track in-place mutation
+            # of JSON columns, so updating keys directly would silently drop
+            # the handwritten regions on commit.
+            document.preprocessing_stats = {
+                **(document.preprocessing_stats or {}),
+                "handwritten_regions": ocr["handwritten_regions"],
+                "pages": len(page_pres),
+            }
             audit.log_action(
                 db, ActionType.OCR_EXECUTED, actor_label=ocr["engine"],
                 entity_type="document", entity_id=document.doc_id, document_id=document.id,
