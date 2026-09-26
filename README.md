@@ -76,6 +76,9 @@ Leaflet from a CDN.
 | Real Odisha Khatiyans (360–510 words, 79–84% OCR) | owners + person relations + parcel areas correct; BR-1 shrunk to classification-only | EC2 pilot records |
 | Hindi profiles live | `up_khatauni`, `mp_khasra`, `bihar_khatiyan` fire incl. fuzzy match on mangled headings | EC2 pilot records |
 | Verifier assists observed | Groq (gpt-oss-120b), spaCy NER, XLM-R NER fill fields regex misses | `source` column per field |
+| spaCy NER (EC2 pilot, live) | `en_core_web_sm` + land-record EntityRuler; `spacy-ner` fills in production records | EC2 pilot extraction rows |
+| HF transformers (EC2 pilot, live) | XLM-R NER (`Davlan/xlm-roberta-base-ner-hrl`): PER/LOC at 1.0 on person/place entities | warm-up + pilot records |
+| TrOCR trial verdict | Base handwritten model reads Latin only — useless for Devanagari; parked pending Indic fine-tune | trial logs |
 | Pipeline latency | 15–127 s/doc on 2 vCPU / 1 GB RAM box (SRS budget 10 s needs production hardware); validation < 1 s/record held | MIS performance panel |
 | OCR stack verified | Tesseract 5.5.0, packs `eng+hin+ori+osd` | `/api/v1/system/status` |
 
