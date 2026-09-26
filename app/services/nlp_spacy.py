@@ -118,6 +118,9 @@ def _valid(field_name: str, value: str, profile: str) -> str:
     if _is_header_leak(cleaned):
         return ""
     if field_name in {"owner_name", "guardian_name", "previous_owner", "new_owner"}:
+        if len(cleaned.split()) < 2 and len(cleaned) < 4:
+            return ""
+    if field_name in {"owner_name", "guardian_name", "previous_owner", "new_owner"}:
         ok, _s = _looks_like_name(cleaned)
         return cleaned if ok else ""
     if re.fullmatch(r"[\d\s/\-.,]+", cleaned):

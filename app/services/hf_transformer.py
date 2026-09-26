@@ -108,6 +108,9 @@ def _valid(field_name: str, value: str, profile: str) -> str:
         return ""
     if _is_header_leak(cleaned):
         return ""
+    if field_name in {"owner_name", "guardian_name", "previous_owner", "new_owner"}:
+        if len(cleaned.split()) < 2 and len(cleaned) < 4:
+            return ""
     pattern = PATTERNS.get(field_name)
     if pattern:
         matches = [m for m in pattern.finditer(cleaned)

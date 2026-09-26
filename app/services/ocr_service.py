@@ -15,6 +15,14 @@ IndicHTR). The returned `WordToken` contract already supports that swap.
 """
 from __future__ import annotations
 
+import os
+
+# Determinism first: Tesseract's OpenMP parallel paths can segment lines
+# differently run-to-run under thread pressure (observed: 88 vs 131 words on
+# the same image). Single-threaded OCR is slower but reproducible, which a
+# government pipeline needs more than speed.
+os.environ.setdefault("OMP_THREAD_LIMIT", "1")
+
 import re
 import shutil
 import time
