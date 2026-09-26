@@ -165,21 +165,28 @@ def detect_layout(binary: np.ndarray, gray: np.ndarray, color: np.ndarray | None
     # --- text blocks --------------------------------------------------------
     text_mask = cv2.dilate(inverted, np.ones((3, 25), np.uint8), iterations=2)
     text_boxes_raw = _boxes_from_mask(text_mask, min_area=400)
-    text_boxes = [
-        b for b in text_boxes_raw
+    free_ids = {
+        id(b) for b in text_boxes_raw
         if not any(_contains(t, b, 0.75) for t in table_boxes)
-    ]
+    }
 
     # --- handwriting vs printed, per text block ----------------------------
+    # Table-caged blocks are classified too: ruled handwritten registers
+    # keep their ink inside table cells, and excluding them blinds the HTR
+    # path entirely. Only the printed_text list stays table-free (whole-page
+    # OCR already covers table print); hand boxes are kept wherever found.
     printed_boxes: list[dict] = []
     hand_boxes: list[dict] = []
-    for box in text_boxes:
+    for box in text_boxes_raw:
         crop = inverted[box["y"]: box["y"] + box["h"], box["x"]: box["x"] + box["w"]]
         mean_stroke, stroke_std = _stroke_width_stats(crop)
         aspect = box["h"] / max(box["w"], 1)
         # thin + irregular strokes, tall narrow blocks -> handwriting
         is_hand = (mean_stroke < 2.1 and stroke_std > 0.55) or (aspect > 0.30 and mean_stroke < 2.6)
-        (hand_boxes if is_hand else printed_boxes).append(box)
+        if is_hand:
+            hand_boxes.append(box)
+        elif id(box) in free_ids:
+            printed_boxes.append(box)
 
     # --- stamp / signature: saturated red or blue blobs ---------------------
     # Requires genuine colour: a grayscale page converted back to BGR has zero
@@ -250,7 +257,10 @@ def _detect_map_regions(inverted: np.ndarray, gray: np.ndarray) -> list[dict]:
     text_density = cv2.blur((text_mask > 0).astype(np.float32), (51, 51))
     boxes = _boxes_from_mask(canvas, min_area=int(w * h * 0.03))
     kept = []
+    page_area = w * h
     for box in boxes:
+        if box["w"] * box["h"] > 0.9 * page_area:
+            continue  # page border/rules, not an inset map region
         patch = text_density[box["y"]: box["y"] + box["h"], box["x"]: box["x"] + box["w"]]
         if patch.size and float(patch.mean()) < 0.42:
             kept.append(box)
