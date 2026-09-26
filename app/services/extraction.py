@@ -324,7 +324,7 @@ PATTERNS: dict[str, re.Pattern] = {
     "mutation_no": re.compile(r"\b[A-Z]{0,4}[-/]?\d{2,6}(?:/\d{2,4})?\b|\b\d{1,5}/\d{4}\b", re.IGNORECASE),
     "registration_no": re.compile(
         r"(?:no\.?\s*)?(?:[A-Z]{2,5}[/-]\d{6,12}"
-        r"|\b\d{1,5}\s*(?:of\s*)?\d{4}(?:\s*[-/]\s*\d{2,4})?\b)",
+        r"|\b\d{1,5}\s*(?:of\s*|[-/])?\s*\d{4}(?:\s*[-/]\s*\d{2,4})?\b)",
         re.IGNORECASE,
     ),
     "mutation_date": re.compile(
@@ -1220,6 +1220,11 @@ def extract_fields(
             # table rows leave the next cell's identifier glued to the name
             # ("Late Balaram Sahoo 123/4") - drop a trailing plot/area number.
             raw_value = re.sub(r"\s+\d{1,4}(?:/\d{1,3})?(?:\s+\d+(?:\.\d+)?)?\s*$", "", raw_value)
+            # OCR splits relation markers ("s O", "[Vendor =") and leaves
+            # single-letter debris that inflates name scores ("= Anonymous
+            # Trust. s O Anonymous Trus" scored 87%). Strip it first.
+            raw_value = re.sub(r"(?<![A-Za-z\u0900-\u097F\u0B00-\u0B7F/])[A-Za-z](?![A-Za-z\u0900-\u097F\u0B00-\u0B7F/])", "", raw_value)
+            raw_value = re.sub(r"\s+", " ", raw_value).strip(" ,.:;-=[]()")
             # Relation prefixes and honorifics are the label, not the name
             # ("S/o Late Balaram Sahoo", "श्री रमेश चंद्र").
             raw_value = re.sub(

@@ -233,6 +233,20 @@ def test_mutation_sweep_rejects_word_fragment():
     assert out.fields["mutation_no"].normalized_value == ""
 
 
+def test_registration_accepts_slash_form():
+    out = extract_fields("Registration No 876/2021", [], profile="generic")
+    assert out.fields["registration_no"].normalized_value == "876/2021"
+
+
+def test_name_debris_stripped_before_scoring():
+    out = extract_fields("Vendor = Anonymous Trust. s O Anonymous Trust",
+                         [], profile="generic")
+    val = out.fields["previous_owner"].normalized_value
+    assert "=" not in val
+    assert "[" not in val
+    assert not [t for t in val.split() if len(t) == 1]
+
+
 def test_fuzzy_profile_survives_mangled_heading():
     from app.services.extraction import detect_profile
     assert detect_profile("बिहार\nजगाबंदी\nअंचल") == "bihar_khatiyan"
