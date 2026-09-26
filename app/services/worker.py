@@ -224,6 +224,23 @@ def _ocr_document(enhanced_path: str, layout: dict, language: str, page: int = 1
             "engine": htr.engine,
             "warnings": htr.warnings,
         })
+        # Pilot tier: TrOCR rescan of the same crop (HF_HTR_ENABLED=1).
+        # Additive evidence only - Tesseract words above stay untouched.
+        try:
+            from app.services import hf_transformer as _hf
+
+            trocr = _hf.htr_rescan(crop_path)
+        except Exception:
+            trocr = {}
+        if trocr.get("text"):
+            handwritten_parts.append({
+                "bbox": region,
+                "text": trocr["text"][:2000],
+                "confidence": trocr.get("confidence", 65.0),
+                "word_count": len(trocr["text"].split()),
+                "engine": trocr.get("engine", "trocr"),
+                "warnings": [],
+            })
 
     all_words = list(printed.words) + htr_words
     for word in all_words:
