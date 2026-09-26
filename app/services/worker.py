@@ -84,7 +84,7 @@ def second_pass_language(page_ocr: dict, doc_profile: str) -> tuple[str, str]:
         return "hin", "profile"
     if _detect_profile(page_ocr.get("text", "")) == "odisha_khatiyan_39a":
         return "ori", "profile"
-    if (page_ocr.get("mean_confidence") or 0) >= 78.0:
+    if (page_ocr.get("mean_confidence") or 0) >= 75.0:
         return "", ""
     scripts: dict[str, int] = {}
     for word in page_ocr.get("words", []):
@@ -92,9 +92,9 @@ def second_pass_language(page_ocr: dict, doc_profile: str) -> tuple[str, str]:
         if script in ("Devanagari", "Odia", "Bengali"):
             scripts[script] = scripts.get(script, 0) + 1
     total = len(page_ocr.get("words", [])) or 1
-    if scripts.get("Devanagari", 0) / total > 0.35:
+    if scripts.get("Devanagari", 0) / total > 0.5:
         return "hin", "vote"
-    if scripts.get("Odia", 0) / total > 0.35:
+    if scripts.get("Odia", 0) / total > 0.5:
         return "ori", "vote"
     return "", ""
 

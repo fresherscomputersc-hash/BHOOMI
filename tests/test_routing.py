@@ -45,3 +45,11 @@ def test_strong_clean_page_skips_vote_pass():
     assert second_pass_language(
         _page("Record of Rights", ["Latin"] * 9 + ["Odia"], conf=85.0),
         "generic") == ("", "")
+
+
+def test_plurality_below_half_skips_vote_pass():
+    # 40% Indic tags with weak confidence is misread noise, not a script
+    # signal - no extra pass.
+    assert second_pass_language(
+        _page("Record of Rights", ["Devanagari"] * 4 + ["Latin"] * 6),
+        "generic") == ("", "")
