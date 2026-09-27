@@ -1,5 +1,5 @@
 import sqlite3
-c = sqlite3.connect("data/bhuverify.db")
+c = sqlite3.connect("data/bhusure.db")
 for doc_id, wants in (
     ("DOC-5F11B732FA", ("previous_owner", "new_owner", "mutation_no", "owner_name")),
     ("DOC-D31D0C5D90", ("khata_no", "plot_no", "village")),

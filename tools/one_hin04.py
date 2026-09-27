@@ -1,5 +1,5 @@
 import json
-rep = json.load(open("/home/ubuntu/Bhuverify-pilot/data/stress_hindi/report_full.json"))
+rep = json.load(open("/home/ubuntu/BhuSure-pilot/data/stress_hindi/report_full.json"))
 for d in rep:
     if d.get("doc_id") == "DOC-40792819A6":
         print(d["file"], d["status"])

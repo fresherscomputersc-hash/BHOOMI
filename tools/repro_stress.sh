@@ -1,5 +1,5 @@
 set -e
-cd /home/ubuntu/Bhuverify-pilot
+cd /home/ubuntu/BhuSure-pilot
 DOCS="DOC-7E22D7E8FE,DOC-A34D3132C0,DOC-77EADAF0A1,DOC-0311738E10,DOC-5F11B732FA"
 ./venv-pilot/bin/python - "$DOCS" <<'PYEOF'
 import json, sys, time, urllib.request

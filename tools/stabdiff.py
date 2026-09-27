@@ -1,7 +1,7 @@
 import json
 for name in ("stress", "hindi", "english"):
-    a = {d["doc_id"]: d for d in json.load(open(f"/home/ubuntu/Bhuverify-pilot/data/roundA/{name}.json"))}
-    b = {d["doc_id"]: d for d in json.load(open(f"/home/ubuntu/Bhuverify-pilot/data/roundB/{name}.json"))}
+    a = {d["doc_id"]: d for d in json.load(open(f"/home/ubuntu/BhuSure-pilot/data/roundA/{name}.json"))}
+    b = {d["doc_id"]: d for d in json.load(open(f"/home/ubuntu/BhuSure-pilot/data/roundB/{name}.json"))}
     print("#" * 20, name)
     for doc_id in a:
         fa, fb = a[doc_id].get("fields") or {}, b[doc_id].get("fields") or {}

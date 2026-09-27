@@ -1,5 +1,5 @@
 set -e
-cd /home/ubuntu/Bhuverify-pilot
+cd /home/ubuntu/BhuSure-pilot
 DOCS="DOC-17A725D645,DOC-40792819A6"
 ./venv-pilot/bin/python - "$DOCS" <<'PYEOF'
 import json, sys, urllib.request
@@ -15,10 +15,10 @@ for d in sys.argv[1].split(","):
     print(d, "reprocess:", urllib.request.urlopen(req, timeout=1200).status, flush=True)
 PYEOF
 ./venv-pilot/bin/python tools/refetch.py --dir data/stress_hindi --docs "$DOCS" > /home/ubuntu/hin34.log 2>&1
-grep -E "hin_0|owner:|village:|ocr:|findings:|engine" /home/ubuntu/Bhuverify-pilot/data/stress_hindi/report_full.json | head -5
+grep -E "hin_0|owner:|village:|ocr:|findings:|engine" /home/ubuntu/BhuSure-pilot/data/stress_hindi/report_full.json | head -5
 ./venv-pilot/bin/python - <<'PYEOF'
 import json
-rep = json.load(open("/home/ubuntu/Bhuverify-pilot/data/stress_hindi/report_full.json"))
+rep = json.load(open("/home/ubuntu/BhuSure-pilot/data/stress_hindi/report_full.json"))
 for d in rep:
     if d.get("doc_id") in ("DOC-17A725D645", "DOC-40792819A6"):
         print("=" * 40)

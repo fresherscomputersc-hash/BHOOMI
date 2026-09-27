@@ -7,6 +7,6 @@ if ! fc-list | grep -qi lohit-odia; then
   fc-cache -f >/dev/null 2>&1 || true
 fi
 fc-list | grep -i lohit | head -4
-cd /home/ubuntu/Bhuverify-pilot
+cd /home/ubuntu/BhuSure-pilot
 ./venv-pilot/bin/python tools/stress_docs.py --out data/stress
 ls -la data/stress

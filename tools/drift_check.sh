@@ -1,5 +1,5 @@
 set -e
-cd /home/ubuntu/Bhuverify-pilot
+cd /home/ubuntu/BhuSure-pilot
 drift=""
 while read -r hash path; do
   path="${path%$'\r'}"

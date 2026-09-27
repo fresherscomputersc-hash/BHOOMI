@@ -1,4 +1,4 @@
-name: Deploy BhuVerify to AWS
+name: Deploy BhuSure to AWS
 
 on:
   push:
@@ -19,22 +19,22 @@ jobs:
           script: |
             set -e
 
-            cd /home/ubuntu/Bhuverify
+            cd /home/ubuntu/BhuSure
 
             echo "Pulling latest code..."
             git fetch origin main
             git reset --hard origin/main
 
             echo "Activating virtual environment..."
-            source /home/ubuntu/Bhuverify/venv/bin/activate
+            source /home/ubuntu/BhuSure/venv/bin/activate
 
             echo "Installing dependencies..."
             pip install -r requirements.txt
 
-            echo "Restarting BhuVerify..."
-            sudo systemctl restart bhuverify
+            echo "Restarting BhuSure..."
+            sudo systemctl restart bhusure
 
             echo "Checking service..."
-            sudo systemctl is-active --quiet bhuverify
+            sudo systemctl is-active --quiet bhusure
 
-            echo "BhuVerify deployment successful!"
+            echo "BhuSure deployment successful!"

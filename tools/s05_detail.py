@@ -1,5 +1,5 @@
 import json
-rep = json.load(open("/home/ubuntu/Bhuverify-pilot/data/stress/report_full.json"))
+rep = json.load(open("/home/ubuntu/BhuSure-pilot/data/stress/report_full.json"))
 for d in rep:
     if d.get("file", "").startswith("stress_05"):
         print(d.get("status"), "err:", (d.get("error") or "")[:150])

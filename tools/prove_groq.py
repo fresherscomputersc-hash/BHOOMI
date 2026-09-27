@@ -1,5 +1,5 @@
 import os
-for line in open("/home/ubuntu/Bhuverify-pilot/.env.pilot").read().splitlines():
+for line in open("/home/ubuntu/BhuSure-pilot/.env.pilot").read().splitlines():
     k, _, v = line.partition("=")
     if k.strip().startswith("GROQ_"):
         os.environ[k.strip()] = v.strip()

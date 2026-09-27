@@ -1,8 +1,8 @@
 import json, sys
-for d, f in (("stress", "/home/ubuntu/Bhuverify-pilot/data/stress/report_full.json"),
-             ("realror", "/home/ubuntu/Bhuverify-pilot/data/realror/report_full.json"),
-             ("hindi", "/home/ubuntu/Bhuverify-pilot/data/stress_hindi/report_full.json"),
-             ("english", "/home/ubuntu/Bhuverify-pilot/data/stress_english/report_full.json")):
+for d, f in (("stress", "/home/ubuntu/BhuSure-pilot/data/stress/report_full.json"),
+             ("realror", "/home/ubuntu/BhuSure-pilot/data/realror/report_full.json"),
+             ("hindi", "/home/ubuntu/BhuSure-pilot/data/stress_hindi/report_full.json"),
+             ("english", "/home/ubuntu/BhuSure-pilot/data/stress_english/report_full.json")):
     print("#" * 25, d)
     txt = open(f).read()
     try:

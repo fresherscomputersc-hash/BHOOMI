@@ -1,4 +1,4 @@
-# BhuVerify - EC2 pilot tier ONLY (local branch `ec2-pilot`, NEVER push to GitHub).
+# BhuSure - EC2 pilot tier ONLY (local branch `ec2-pilot`, NEVER push to GitHub).
 #
 # The GitHub/Render image uses requirements.txt (Tesseract + rapidfuzz only).
 # Install this on the EC2 box with:

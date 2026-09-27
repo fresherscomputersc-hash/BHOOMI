@@ -18,4 +18,6 @@ data/geojson/
 data/reports/
 # Real Bhulekh RoRs (owner PII) must never enter git.
 /sample/*.pdf
+bhusure-key.pem
+# legacy key filename - never commit any .pem
 bhuverify-key.pem

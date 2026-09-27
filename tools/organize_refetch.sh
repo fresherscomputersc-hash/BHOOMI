@@ -1,5 +1,5 @@
 set -e
-cd /home/ubuntu/Bhuverify-pilot
+cd /home/ubuntu/BhuSure-pilot
 mkdir -p data/realror
 mv tools/upload_staging_tmp/488.pdf tools/upload_staging_tmp/4-19.pdf tools/upload_staging_tmp/313.pdf tools/upload_staging_tmp/72.pdf tools/upload_staging_tmp/4558.pdf data/realror/
 mv tools/upload_staging_tmp/run_stress.py tools/upload_staging_tmp/refetch.py tools/

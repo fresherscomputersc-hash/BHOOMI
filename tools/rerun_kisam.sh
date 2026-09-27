@@ -1,8 +1,8 @@
 set -e
-cd /home/ubuntu/Bhuverify-pilot
+cd /home/ubuntu/BhuSure-pilot
 REAL="DOC-1FB224189E,DOC-32EF2C9A42,DOC-5079BA613F,DOC-8254348B5A,DOC-C6716C084E"
 sed -i 's/^GROQ_ENABLED=.*/GROQ_ENABLED=0/' .env.pilot
-sudo systemctl restart bhuverify-pilot
+sudo systemctl restart bhusure-pilot
 sleep 12
 ./venv-pilot/bin/python - "$REAL" <<'PYEOF'
 import json, sys, urllib.request
@@ -21,6 +21,6 @@ PYEOF
 ./venv-pilot/bin/python tools/delta.py > /home/ubuntu/delta2.log 2>&1
 tail -40 /home/ubuntu/delta2.log
 sed -i 's/^GROQ_ENABLED=.*/GROQ_ENABLED=1/' .env.pilot
-sudo systemctl restart bhuverify-pilot
+sudo systemctl restart bhusure-pilot
 sleep 10
-sudo systemctl is-active bhuverify-pilot
+sudo systemctl is-active bhusure-pilot

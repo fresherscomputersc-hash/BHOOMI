@@ -1,5 +1,5 @@
 set -e
-cd /home/ubuntu/Bhuverify-pilot
+cd /home/ubuntu/BhuSure-pilot
 STRESS="DOC-7E22D7E8FE,DOC-A34D3132C0,DOC-77EADAF0A1,DOC-0311738E10,DOC-5F11B732FA"
 HINDI="DOC-D31D0C5D90,DOC-ABBCBF9EC0,DOC-17A725D645,DOC-40792819A6,DOC-A214441E0D"
 ENG="DOC-FDDAE6896C,DOC-1A616C1640,DOC-F935EE7D6B,DOC-6A0657EB42,DOC-8BC2DF5952"
@@ -20,7 +20,7 @@ for d in sys.argv[1].split(","):
 PYEOF
 }
 sed -i 's/^GROQ_ENABLED=.*/GROQ_ENABLED=0/' .env.pilot
-sudo systemctl restart bhuverify-pilot
+sudo systemctl restart bhusure-pilot
 sleep 40
 repro
 ./venv-pilot/bin/python tools/refetch.py --dir data/stress --docs "$STRESS" >/dev/null 2>&1
@@ -41,8 +41,8 @@ cp data/stress_english/report_full.json data/roundB/english.json
 ./venv-pilot/bin/python - <<'PYEOF'
 import json
 for name in ("stress", "hindi", "english"):
-    a = {d["doc_id"]: d for d in json.load(open(f"/home/ubuntu/Bhuverify-pilot/data/roundA/{name}.json"))}
-    b = {d["doc_id"]: d for d in json.load(open(f"/home/ubuntu/Bhuverify-pilot/data/roundB/{name}.json"))}
+    a = {d["doc_id"]: d for d in json.load(open(f"/home/ubuntu/BhuSure-pilot/data/roundA/{name}.json"))}
+    b = {d["doc_id"]: d for d in json.load(open(f"/home/ubuntu/BhuSure-pilot/data/roundB/{name}.json"))}
     print("#" * 20, name)
     for doc_id in a:
         fa, fb = a[doc_id].get("fields") or {}, b[doc_id].get("fields") or {}
@@ -51,6 +51,6 @@ for name in ("stress", "hindi", "english"):
         print(f"{a[doc_id].get('file')}: ocr_words stable={wa} ({a[doc_id].get('ocr_words')} vs {b[doc_id].get('ocr_words')}) field_diffs={diffs}")
 PYEOF
 sed -i 's/^GROQ_ENABLED=.*/GROQ_ENABLED=1/' .env.pilot
-sudo systemctl restart bhuverify-pilot
+sudo systemctl restart bhusure-pilot
 sleep 30
-sudo systemctl is-active bhuverify-pilot
+sudo systemctl is-active bhusure-pilot

@@ -1,13 +1,13 @@
 set -e
-cd /home/ubuntu/Bhuverify-pilot
-for svc in bhuverify bhuverify-pilot; do
+cd /home/ubuntu/BhuSure-pilot
+for svc in bhusure bhusure-pilot; do
   grep -q OMP_THREAD_LIMIT /etc/systemd/system/$svc.service || sudo sed -i '/^Environment=PATH/a Environment=OMP_THREAD_LIMIT=1' /etc/systemd/system/$svc.service
 done
-grep -h OMP /etc/systemd/system/bhuverify.service /etc/systemd/system/bhuverify-pilot.service
+grep -h OMP /etc/systemd/system/bhusure.service /etc/systemd/system/bhusure-pilot.service
 sudo systemctl daemon-reload
-sudo systemctl restart bhuverify bhuverify-pilot
+sudo systemctl restart bhusure bhusure-pilot
 sleep 45
-sudo systemctl is-active bhuverify bhuverify-pilot
+sudo systemctl is-active bhusure bhusure-pilot
 STRESS="DOC-7E22D7E8FE,DOC-A34D3132C0,DOC-77EADAF0A1,DOC-0311738E10,DOC-5F11B732FA"
 HINDI="DOC-D31D0C5D90,DOC-ABBCBF9EC0,DOC-17A725D645,DOC-40792819A6,DOC-A214441E0D"
 ENG="DOC-FDDAE6896C,DOC-1A616C1640,DOC-F935EE7D6B,DOC-6A0657EB42,DOC-8BC2DF5952"

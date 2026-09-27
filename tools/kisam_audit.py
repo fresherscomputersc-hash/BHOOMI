@@ -1,5 +1,5 @@
 import sqlite3
-c = sqlite3.connect("data/bhuverify.db")
+c = sqlite3.connect("data/bhusure.db")
 from app.master_data import CLASSIFICATION_ALIASES
 for fn in ("4558.pdf", "313.pdf", "488.pdf"):
     doc = c.execute("select id from source_documents where original_filename=?",

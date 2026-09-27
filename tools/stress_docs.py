@@ -12,7 +12,7 @@ Tesseract must genuinely read them:
   STRESS-5  mutation page (parties, case no, dates)         -> BR-5 / BR-10
 
 Usage (on EC2 pilot box):
-    cd /home/ubuntu/Bhuverify-pilot
+    cd /home/ubuntu/BhuSure-pilot
     ./venv-pilot/bin/python tools/stress_docs.py --out data/stress
 """
 from __future__ import annotations

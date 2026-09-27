@@ -1,5 +1,5 @@
 import json
-rep = json.load(open("/home/ubuntu/Bhuverify-pilot/data/realror/report_full.json"))
+rep = json.load(open("/home/ubuntu/BhuSure-pilot/data/realror/report_full.json"))
 for d in rep:
     if d.get("file") in ("313.pdf", "4-19.pdf"):
         print("=" * 60)

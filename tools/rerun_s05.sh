@@ -1,8 +1,8 @@
 set -e
-cd /home/ubuntu/Bhuverify-pilot
-sudo systemctl restart bhuverify-pilot
+cd /home/ubuntu/BhuSure-pilot
+sudo systemctl restart bhusure-pilot
 sleep 15
-sudo systemctl is-active bhuverify-pilot
+sudo systemctl is-active bhusure-pilot
 ./venv-pilot/bin/python - <<'PYEOF'
 import json, urllib.request
 BASE = "http://127.0.0.1:8001"

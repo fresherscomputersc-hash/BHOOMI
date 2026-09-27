@@ -1,0 +1,876 @@
+[
+ {
+  "file": "sample_01_ror_clean.png",
+  "lang": "eng",
+  "ocr_ms": 10918.0,
+  "words": 139,
+  "mean_conf": 69.87,
+  "min_conf": 0.0,
+  "low_conf_words": 58,
+  "profile": "generic",
+  "text_preview": "GOVERNMENT OF ODISHA |  | RECORD OF RIGHTS (RoR) | Revenue Department - Khordha District | District =                               Khordha | |Tehsit/ Block | Khordha Sadar sd / Block                        Khordha Sadar | \u0b6e] Balarampur, sd / Mouza                          Balarampur | [KhataNumber 204s Number   ",
+  "fields": {
+   "khasra_no": {
+    "v": "= 1182s Number 118/2",
+    "conf": 87.72,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "[KhasraNumber = 1182s Number 118/2"
+   },
+   "khata_no": {
+    "v": "204s Number 204",
+    "conf": 90.16,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "[KhataNumber 204s Number 204"
+   },
+   "survey_no": {
+    "v": "and Settlement Ac",
+    "conf": 47.97,
+    "status": "needs_review",
+    "src": "regex",
+    "ev": "Certified true copy - prepared under the Odisha Survey and Settlement "
+   },
+   "plot_no": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "village": {
+    "v": "Balarampur",
+    "conf": 50.28,
+    "status": "needs_review",
+    "src": "regex",
+    "ev": "\u0b6e] Balarampur, sd / Mouza Balarampur"
+   },
+   "tehsil": {
+    "v": "",
+    "conf": 0.0,
+    "status": "needs_review",
+    "src": "label",
+    "ev": "|Tehsit/ Block | Khordha Sadar sd / Block Khordha Sadar"
+   },
+   "district": {
+    "v": "= Khordha",
+    "conf": 60.72,
+    "status": "needs_review",
+    "src": "regex",
+    "ev": "District = Khordha"
+   },
+   "owner_name": {
+    "v": "Prafulla Kumar Sahoo",
+    "conf": 73.25,
+    "status": "extracted",
+    "src": "regex+ner",
+    "ev": "New Owner Prafulla Kumar Sahoo"
+   },
+   "guardian_name": {
+    "v": "",
+    "conf": 44.91,
+    "status": "needs_review",
+    "src": "regex+ner",
+    "ev": "[Father Name | BasantaKumarSahoo sd Name Basanta Kumar Sahoo"
+   },
+   "address": {
+    "v": "",
+    "conf": 43.79,
+    "status": "needs_review",
+    "src": "regex",
+    "ev": "[Address | AtBalarampur,POSundarpada = At Balarampur, PO Sundarpada"
+   },
+   "area": {
+    "v": "1.14 acre",
+    "conf": 86.09,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "\u0932\u0917\u0928 = there | Area 1.14 acre"
+   },
+   "land_classification": {
+    "v": "= jimrigatediand sd",
+    "conf": 63.25,
+    "status": "needs_review",
+    "src": "regex",
+    "ev": "[Land Classification = jimrigatediand sd Classification Irrigated land"
+   },
+   "boundaries": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "mutation_no": {
+    "v": "=",
+    "conf": 50.92,
+    "status": "needs_review",
+    "src": "regex",
+    "ev": "| Mutation Number =| MUT/2042019 = Number MUT/204/2019"
+   },
+   "mutation_date": {
+    "v": "=",
+    "conf": 51.08,
+    "status": "needs_review",
+    "src": "regex",
+    "ev": "|MutationDate = | 20320... | Date 12/03/2019"
+   },
+   "registration_no": {
+    "v": "1234 of 2019",
+    "conf": 95.2,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "| Registration Number 1234 of 2019"
+   },
+   "previous_owner": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "new_owner": {
+    "v": "Prafulla Kumar Sahoo",
+    "conf": 75.25,
+    "status": "extracted",
+    "src": "regex+ner",
+    "ev": "New Owner Prafulla Kumar Sahoo"
+   }
+  },
+  "record_conf": 65.16,
+  "missing_required": [
+   "tehsil"
+  ],
+  "area_ha": 0.461342,
+  "unit_ok": true
+ },
+ {
+  "file": "sample_02_ror_degraded.jpg",
+  "lang": "eng",
+  "ocr_ms": 12101.5,
+  "words": 121,
+  "mean_conf": 69.46,
+  "min_conf": 0.0,
+  "low_conf_words": 43,
+  "profile": "generic",
+  "text_preview": "= OF ODISHA | RECORD OF RIGHTS (RoR) | een ea - Khordha District |  | | |  | Revenue Depa |  | ee |  | \u0b30\u0b3f | |  | |    ee / Block                        Khordha Sadar |  | See rue \u0b6d. |  | Village / Mouza |  | |     \u0b2e\u0b2e aie \u02c6\u201c Number                             204 |  | a ne oo Number                                   118/4 |  | |   ee \u0b6c\u0b6c\u201c Numbe",
+  "fields": {
+   "khasra_no": {
+    "v": "118/4",
+    "conf": 74.65,
+    "status": "extracted",
+    "src": "pattern_sweep",
+    "ev": "118/4"
+   },
+   "khata_no": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "survey_no": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "plot_no": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "village": {
+    "v": "",
+    "conf": 0.0,
+    "status": "needs_review",
+    "src": "label",
+    "ev": "Village / Mouza"
+   },
+   "tehsil": {
+    "v": "Khordha Sadar",
+    "conf": 78.33,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "| ee / Block Khordha Sadar"
+   },
+   "district": {
+    "v": "",
+    "conf": 0.0,
+    "status": "needs_review",
+    "src": "label",
+    "ev": "een ea - Khordha District"
+   },
+   "owner_name": {
+    "v": "Basanta Kumar Sahoo",
+    "conf": 72.83,
+    "status": "extracted",
+    "src": "regex+ner",
+    "ev": "\u0932\u0917 ate eee Owner Basanta Kumar Sahoo"
+   },
+   "guardian_name": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "address": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "area": {
+    "v": "0.75 acre",
+    "conf": 86.26,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "| ee \u0b35\u0b6b\u0b15\u0b15-- Area 0.75 acre"
+   },
+   "land_classification": {
+    "v": "Irrigated land",
+    "conf": 80.58,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "Se ees `\u201c. Classification Irrigated land"
+   },
+   "boundaries": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "mutation_no": {
+    "v": "204/2020",
+    "conf": 60.25,
+    "status": "needs_review",
+    "src": "pattern_sweep",
+    "ev": "MUT/204/2020"
+   },
+   "mutation_date": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "registration_no": {
+    "v": "REG-X-99-13",
+    "conf": 53.5,
+    "status": "needs_review",
+    "src": "regex",
+    "ev": "` ` \u00a6 Registration Number REG-X-99-13"
+   },
+   "previous_owner": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "new_owner": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   }
+  },
+  "record_conf": 59.32,
+  "missing_required": [
+   "khata_no",
+   "village",
+   "district"
+  ],
+  "area_ha": 0.303515,
+  "unit_ok": true
+ },
+ {
+  "file": "sample_03_register_handwritten_hindi.png",
+  "lang": "hin",
+  "ocr_ms": 2241.9,
+  "words": 55,
+  "mean_conf": 92.09,
+  "min_conf": 48.0,
+  "low_conf_words": 1,
+  "profile": "generic",
+  "text_preview": "LE |  | \u0930\u093e\u091c\u0938\u094d\u0935 \u0935\u093f\u092d\u093e\u0917 - \u0916\u0941\u0930\u094d\u0926\u093e \u091c\u093f\u0932\u093e |  | \u091c\u093f\u0932\u093e                                                    wal |  | \u0924\u0939\u0938\u0940\u0932                                                 \u0916\u0941\u0930\u094d\u0926\u093e \u0938\u0926\u0930 |  | \u0917\u094d\u0930\u093e\u092e                                                       \u092c\u0932\u0930\u093e\u092e\u092a\u0941\u0930 |  | \u0916\u093e\u0924\u093e \u0938\u0902\u0916\u094d\u092f\u093e                                           204 |  | \u0916\u0938\u0930\u093e \u0938\u0902\u0916\u094d\u092f\u093e ",
+  "fields": {
+   "khasra_no": {
+    "v": "88/1",
+    "conf": 91.6,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "\u0916\u0938\u0930\u093e \u0938\u0902\u0916\u094d\u092f\u093e 88/1"
+   },
+   "khata_no": {
+    "v": "204",
+    "conf": 94.75,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "\u0916\u093e\u0924\u093e \u0938\u0902\u0916\u094d\u092f\u093e 204"
+   },
+   "survey_no": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "plot_no": {
+    "v": "1",
+    "conf": 95.2,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "\u0926\u093e\u0917 1"
+   },
+   "village": {
+    "v": "\u092c\u0932\u0930\u093e\u092e\u092a\u0941\u0930",
+    "conf": 84.36,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "\u0917\u094d\u0930\u093e\u092e \u092c\u0932\u0930\u093e\u092e\u092a\u0941\u0930"
+   },
+   "tehsil": {
+    "v": "\u0916\u0941\u0930\u094d\u0926\u093e \u0938\u0926\u0930",
+    "conf": 84.14,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "\u0924\u0939\u0938\u0940\u0932 \u0916\u0941\u0930\u094d\u0926\u093e \u0938\u0926\u0930"
+   },
+   "district": {
+    "v": "wal",
+    "conf": 74.5,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "\u091c\u093f\u0932\u093e wal"
+   },
+   "owner_name": {
+    "v": "\u092a\u094d\u0930\u092b\u0941\u0932\u094d\u0932 \u0915\u0941\u092e\u093e\u0930 \u0938\u093e\u0939\u0942",
+    "conf": 88.18,
+    "status": "extracted",
+    "src": "regex+ner",
+    "ev": "\u0916\u093e\u0924\u0947\u0926\u093e\u0930 \u0915\u093e \u0928\u093e\u092e \u092a\u094d\u0930\u092b\u0941\u0932\u094d\u0932 \u0915\u0941\u092e\u093e\u0930 \u0938\u093e\u0939\u0942"
+   },
+   "guardian_name": {
+    "v": "\u092c\u0938\u0902\u0924 \u0915\u0941\u092e\u093e\u0930 \u0938\u093e\u0939\u0942",
+    "conf": 89.16,
+    "status": "extracted",
+    "src": "regex+ner",
+    "ev": "\u092a\u093f\u0924\u093e \u0915\u093e \u0928\u093e\u092e \u092c\u0938\u0902\u0924 \u0915\u0941\u092e\u093e\u0930 \u0938\u093e\u0939\u0942"
+   },
+   "address": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "area": {
+    "v": "0.60 acre",
+    "conf": 90.7,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "\u0915\u094d\u0937\u0947\u0924\u094d\u0930\u092b\u0932 0.60 acre"
+   },
+   "land_classification": {
+    "v": "Plantation land",
+    "conf": 83.2,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "\u091c\u092e\u0940\u0928 \u0915\u093e \u092a\u094d\u0930\u0915\u093e\u0930 Plantation land"
+   },
+   "boundaries": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "mutation_no": {
+    "v": "\u0938\u0902\u0916\u094d\u092f\u093e MUT/204/2018",
+    "conf": 86.44,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "\u0928\u093e\u092e\u093e\u0902\u0924\u0930\u0923 \u0938\u0902\u0916\u094d\u092f\u093e MUT/204/2018"
+   },
+   "mutation_date": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "registration_no": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "previous_owner": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "new_owner": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   }
+  },
+  "record_conf": 87.48,
+  "missing_required": [],
+  "area_ha": 0.242812,
+  "unit_ok": true
+ },
+ {
+  "file": "sample_04_conflicting_owner.png",
+  "lang": "eng",
+  "ocr_ms": 12304.7,
+  "words": 120,
+  "mean_conf": 66.79,
+  "min_conf": 0.0,
+  "low_conf_words": 55,
+  "profile": "generic",
+  "text_preview": "GOVERNMENT OF ODISHA |  | MUTATION REGISTER ENTRY | Revenue Department - Khordha District |  | District |                               Khordha | [Tehsit/ Block =| Nirakerpur sd / Block                         Nirakarpur | \u0b6e: Gola \u0b2d\u0b47 \u0b2c\u0b47 \u0b2c\u0b36 / Mouza                      Golabai | [KhataNumber 118s Number             ",
+  "fields": {
+   "khasra_no": {
+    "v": "227/1",
+    "conf": 76.0,
+    "status": "extracted",
+    "src": "pattern_sweep",
+    "ev": "227/1"
+   },
+   "khata_no": {
+    "v": "118s Number 118",
+    "conf": 90.16,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "[KhataNumber 118s Number 118"
+   },
+   "survey_no": {
+    "v": "207s Number 227",
+    "conf": 90.45,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "[surveyNumber 207s Number 227"
+   },
+   "plot_no": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "village": {
+    "v": "Golabai",
+    "conf": 76.44,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "\u0b6e: Gola \u0b2d\u0b47 \u0b2c\u0b47 \u0b2c\u0b36 / Mouza Golabai"
+   },
+   "tehsil": {
+    "v": "",
+    "conf": 43.75,
+    "status": "needs_review",
+    "src": "regex",
+    "ev": "[Tehsit/ Block =| Nirakerpur sd / Block Nirakarpur"
+   },
+   "district": {
+    "v": "",
+    "conf": 0.0,
+    "status": "needs_review",
+    "src": "label",
+    "ev": "District | Khordha"
+   },
+   "owner_name": {
+    "v": "Sunita Pradhan",
+    "conf": 73.88,
+    "status": "extracted",
+    "src": "regex+ner",
+    "ev": "New Owner Sunita Pradhan"
+   },
+   "guardian_name": {
+    "v": "",
+    "conf": 45.0,
+    "status": "needs_review",
+    "src": "regex+ner",
+    "ev": "[Father Name =| Bhagirathi Pradhan | Name Bhagirathi Pradhan"
+   },
+   "address": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "area": {
+    "v": "1.00 acre",
+    "conf": 86.02,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "\u0932\u0917\u0928 = tere sss Area 1.00 acre"
+   },
+   "land_classification": {
+    "v": "",
+    "conf": 0.0,
+    "status": "needs_review",
+    "src": "label",
+    "ev": "[Land Classification | Unimigatedland sd Classification Unirrigated la"
+   },
+   "boundaries": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "mutation_no": {
+    "v": "=f MUTINV82021 sd Number MUT/118/2021",
+    "conf": 85.87,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "[Mutation Number =f MUTINV82021 sd Number MUT/118/2021"
+   },
+   "mutation_date": {
+    "v": "= \u0b6d\u0b6e\u0b6e\u0b67 Date 21/07/2021",
+    "conf": 89.22,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "|MutationDate = \u0b6d\u0b6e\u0b6e\u0b67 Date 21/07/2021"
+   },
+   "registration_no": {
+    "v": "876 of 2021",
+    "conf": 95.2,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "| Registration Number 876 of 2021"
+   },
+   "previous_owner": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "new_owner": {
+    "v": "Sunita Pradhan",
+    "conf": 76.38,
+    "status": "extracted",
+    "src": "regex+ner",
+    "ev": "New Owner Sunita Pradhan"
+   }
+  },
+  "record_conf": 68.85,
+  "missing_required": [
+   "tehsil",
+   "district",
+   "land_classification"
+  ],
+  "area_ha": 0.404686,
+  "unit_ok": true
+ },
+ {
+  "file": "sample_05_area_mismatch.png",
+  "lang": "eng",
+  "ocr_ms": 13133.5,
+  "words": 132,
+  "mean_conf": 66.46,
+  "min_conf": 0.0,
+  "low_conf_words": 61,
+  "profile": "generic",
+  "text_preview": "GOVERNMENT OF ODISHA |  | RECORD OF RIGHTS (RoR) | Revenue Department - Khordha District | District |                               Khordha | |Tehsit/ Block \u0b6e2 sd / Block                        Khordha Sadar | |Vitlage/Mouza =| Balarampur, sd / Mouza                          Balarampur | [KhataNumber 209s Number ",
+  "fields": {
+   "khasra_no": {
+    "v": "= 1182s Number 118/2",
+    "conf": 87.27,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "[KhasraNumber = 1182s Number 118/2"
+   },
+   "khata_no": {
+    "v": "209s Number 209",
+    "conf": 90.16,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "[KhataNumber 209s Number 209"
+   },
+   "survey_no": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "plot_no": {
+    "v": "digitised for conflict review",
+    "conf": 47.72,
+    "status": "needs_review",
+    "src": "regex",
+    "ev": "Second claim on the same plot - digitised for conflict review."
+   },
+   "village": {
+    "v": "",
+    "conf": 43.72,
+    "status": "needs_review",
+    "src": "regex",
+    "ev": "|Vitlage/Mouza =| Balarampur, sd / Mouza Balarampur"
+   },
+   "tehsil": {
+    "v": "\u0b6e2 sd",
+    "conf": 57.66,
+    "status": "needs_review",
+    "src": "regex",
+    "ev": "|Tehsit/ Block \u0b6e2 sd / Block Khordha Sadar"
+   },
+   "district": {
+    "v": "",
+    "conf": 0.0,
+    "status": "needs_review",
+    "src": "label",
+    "ev": "District | Khordha"
+   },
+   "owner_name": {
+    "v": "New Owner \u0b09\u0b20\u0b3e Nayak sd Owner Bhagaban Nayak",
+    "conf": 60.51,
+    "status": "needs_review",
+    "src": "table_row",
+    "ev": "New Owner \u0b09\u0b20\u0b3e Nayak sd Owner Bhagaban Nayak"
+   },
+   "guardian_name": {
+    "v": "",
+    "conf": 45.84,
+    "status": "needs_review",
+    "src": "regex+ner",
+    "ev": "|FatherName = | MariNeyak sd Name Hari Nayak"
+   },
+   "address": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "area": {
+    "v": "1.42 acre",
+    "conf": 85.66,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "\u0b1c\u0b4d\u0b1e\u0b4b\u0b15\u0b4d\u0b3e\u0b37\u0b38\u0b4d terre ssi Area 1.42 acre"
+   },
+   "land_classification": {
+    "v": "\u0b2f\u0b2f \u0b6e \u0b24",
+    "conf": 53.73,
+    "status": "needs_review",
+    "src": "regex",
+    "ev": "[Land Classification \u0b2f\u0b2f \u0b6e \u0b24 Classification Irrigated land"
+   },
+   "boundaries": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "mutation_no": {
+    "v": "",
+    "conf": 0.0,
+    "status": "needs_review",
+    "src": "label",
+    "ev": "| Mutation Number | MUT/2092022 =- sd Number MUT/209/2022"
+   },
+   "mutation_date": {
+    "v": "=",
+    "conf": 49.16,
+    "status": "needs_review",
+    "src": "regex",
+    "ev": "[Mutation Date = |09\u0936092022 ................................... | Date"
+   },
+   "registration_no": {
+    "v": "",
+    "conf": 0.0,
+    "status": "needs_review",
+    "src": "label",
+    "ev": "[Registration Number | 3311012022 Number 3311 of 2022"
+   },
+   "previous_owner": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "new_owner": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   }
+  },
+  "record_conf": 58.5,
+  "missing_required": [
+   "village",
+   "district"
+  ],
+  "area_ha": 0.574654,
+  "unit_ok": true
+ },
+ {
+  "file": "sample_06_multi_plot_page.png",
+  "lang": "eng",
+  "ocr_ms": 10978.6,
+  "words": 121,
+  "mean_conf": 67.87,
+  "min_conf": 0.0,
+  "low_conf_words": 52,
+  "profile": "generic",
+  "text_preview": "GOVERNMENT OF ODISHA |  | PLOT-WISE REGISTER EXTRACT | Revenue Department - Khordha District |  | District |                               Khordha | [Tehsit/Block \u0916\u093e\u0915 | / Block                         Jankia | \u0b6e]: Janakpur ssid / Mouza                      Janakpur | [Khatanumber fF Number                       77 | ",
+  "fields": {
+   "khasra_no": {
+    "v": "[3400s Number 340",
+    "conf": 90.04,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "[KhasraNumber [3400s Number 340"
+   },
+   "khata_no": {
+    "v": "f F Number 77",
+    "conf": 86.83,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "[Khatanumber fF Number 77"
+   },
+   "survey_no": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "plot_no": {
+    "v": "WISE REGISTER EXTRACT",
+    "conf": 49.06,
+    "status": "needs_review",
+    "src": "regex",
+    "ev": "PLOT-WISE REGISTER EXTRACT"
+   },
+   "village": {
+    "v": "Janakpur",
+    "conf": 46.36,
+    "status": "needs_review",
+    "src": "regex",
+    "ev": "\u0b6e]: Janakpur ssid / Mouza Janakpur"
+   },
+   "tehsil": {
+    "v": "\u0916\u093e\u0915",
+    "conf": 59.86,
+    "status": "needs_review",
+    "src": "regex",
+    "ev": "[Tehsit/Block \u0916\u093e\u0915 | / Block Jankia"
+   },
+   "district": {
+    "v": "",
+    "conf": 0.0,
+    "status": "needs_review",
+    "src": "label",
+    "ev": "District | Khordha"
+   },
+   "owner_name": {
+    "v": "\u0b6f \u0b26\u0b2b\u0b06 Name Ramesh Chandra Behera",
+    "conf": 77.01,
+    "status": "extracted",
+    "src": "regex+ner",
+    "ev": "[OwnerName \u0b6f \u0b26\u0b2b\u0b06 Name Ramesh Chandra Behera"
+   },
+   "guardian_name": {
+    "v": "",
+    "conf": 45.2,
+    "status": "needs_review",
+    "src": "regex+ner",
+    "ev": "[Father Name =| DibakarBehera@ ssid Name Dibakar Behera"
+   },
+   "address": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "area": {
+    "v": "3.00 acre",
+    "conf": 85.95,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "\u0932\u0917\u0928 = \u0b13 aere@ | Area 3.00 acre"
+   },
+   "land_classification": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "boundaries": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "mutation_no": {
+    "v": "=f MUTITZI2020- = Number MUT/77/2021",
+    "conf": 85.95,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "[Mutation Number =f MUTITZI2020- = Number MUT/77/2021"
+   },
+   "mutation_date": {
+    "v": "=f gznsozt ssi Date 32/13/2021",
+    "conf": 88.28,
+    "status": "extracted",
+    "src": "regex",
+    "ev": "[Mutation Date =f gznsozt ssi Date 32/13/2021"
+   },
+   "registration_no": {
+    "v": "",
+    "conf": 0.0,
+    "status": "needs_review",
+    "src": "label",
+    "ev": "[Registration Number | 4455020200 sd Number 4455 of 2020"
+   },
+   "previous_owner": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   },
+   "new_owner": {
+    "v": "",
+    "conf": 0.0,
+    "status": "missing",
+    "src": "regex",
+    "ev": ""
+   }
+  },
+  "record_conf": 65.45,
+  "missing_required": [
+   "district",
+   "land_classification"
+  ],
+  "area_ha": 1.214058,
+  "unit_ok": true
+ }
+]

@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: bhuverify
+    name: bhusure
     runtime: docker
     plan: free
     region: singapore

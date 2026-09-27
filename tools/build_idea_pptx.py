@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Fill the official SIH 2026 Idea template with BhuVerify content.
+"""Fill the official SIH 2026 Idea template with BhuSure content.
 
 Reads ppt/SIH2026-IDEA-Presentation-Format (3).pptx, replaces ONLY text runs
 (structure, masters, placeholders, pictures untouched) and writes
-ppt/BhuVerify_SIH26018_Idea_Presentation.pptx.
+ppt/BhuSure_SIH26018_Idea_Presentation.pptx.
 Content: BHOOMI README facts only. Style: Arial body bullets w/ bold leads.
 """
 from __future__ import annotations
@@ -15,12 +15,12 @@ from pptx.util import Pt
 
 HERE = Path(__file__).resolve().parent.parent
 TEMPLATE = HERE / "ppt" / "SIH2026-IDEA-Presentation-Format (3).pptx"
-OUT = HERE / "ppt" / "BhuVerify_SIH26018_Idea_Presentation.pptx"
+OUT = HERE / "ppt" / "BhuSure_SIH26018_Idea_Presentation.pptx"
 
 TEAM = "Shadow Slayers"
 BODY_SIZE = Pt(18)
 
-TITLE_IDEA = "BhuVerify: Intelligent Land Record Digitization & Validation"
+TITLE_IDEA = "BhuSure: Intelligent Land Record Digitization & Validation"
 
 S2 = [
     ("What it is: ",
@@ -85,7 +85,7 @@ S6 = [
      "SIH26018, Ministry of Rural Development; repo: https://github.com/fresherscomputersc-hash/BHOOMI."),
 ]
 
-TITLE_TEXT = "Problem Statement ID SIH26018 | BhuVerify \u2014 Intelligent Land Record Digitization and Validation System | Theme: Smart Automation | PS Category: Software | Team ID- | Team Shadow Slayers"
+TITLE_TEXT = "Problem Statement ID SIH26018 | BhuSure \u2014 Intelligent Land Record Digitization and Validation System | Theme: Smart Automation | PS Category: Software | Team ID- | Team Shadow Slayers"
 
 
 def _run_props(run):
@@ -152,7 +152,7 @@ def main() -> None:
     s1 = prs.slides[0]
     set_lines(shape_by(s1, "TextBox 9"), [
         "Problem Statement ID SIH26018",
-        "Problem Statement Title - BhuVerify: Intelligent Land Record Digitization and Validation System",
+        "Problem Statement Title - BhuSure: Intelligent Land Record Digitization and Validation System",
         "Theme - Smart Automation",
         "PS Category - Software",
         "Team ID -",

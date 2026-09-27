@@ -1,5 +1,5 @@
 import sqlite3
-c = sqlite3.connect("data/bhuverify.db")
+c = sqlite3.connect("data/bhusure.db")
 print("docs", c.execute("select count(*) from source_documents").fetchone())
 print("records", c.execute("select count(*) from land_records").fetchone())
 for row in c.execute("select actor_label, count(*) from audit_logs group by 1 order by 2 desc"):

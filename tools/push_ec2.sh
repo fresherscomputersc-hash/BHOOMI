@@ -1,8 +1,8 @@
 set -e
-cd /home/ubuntu/Bhuverify-pilot
-sudo systemctl restart bhuverify-pilot
+cd /home/ubuntu/BhuSure-pilot
+sudo systemctl restart bhusure-pilot
 sleep 15
-sudo systemctl is-active bhuverify-pilot
+sudo systemctl is-active bhusure-pilot
 curl -s -o /dev/null -w "health:%{http_code}\n" http://127.0.0.1:8001/api/v1/health
 ./venv-pilot/bin/python -m pytest tests/ -q 2>&1 | tail -2
 ./venv-pilot/bin/python tools/run_stress.py --dir data/stress_hindi --glob "*" > /home/ubuntu/hindi-run.log 2>&1

@@ -1,8 +1,8 @@
 set -e
-cd /home/ubuntu/Bhuverify-pilot
+cd /home/ubuntu/BhuSure-pilot
 HIN="DOC-D31D0C5D90,DOC-ABBCBF9EC0,DOC-17A725D645,DOC-40792819A6,DOC-A214441E0D"
 ENG="DOC-FDDAE6896C,DOC-1A616C1640,DOC-F935EE7D6B,DOC-6A0657EB42,DOC-8BC2DF5952"
-sudo systemctl restart bhuverify-pilot
+sudo systemctl restart bhusure-pilot
 sleep 12
 ./venv-pilot/bin/python - "$HIN $ENG" <<'PYEOF'
 import json, sys, urllib.request

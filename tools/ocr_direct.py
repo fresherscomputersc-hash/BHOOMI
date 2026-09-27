@@ -1,5 +1,5 @@
 import sqlite3, json, traceback
-c = sqlite3.connect("data/bhuverify.db")
+c = sqlite3.connect("data/bhusure.db")
 row = c.execute("select enhanced_path, layout_json from source_documents where doc_id='DOC-17A725D645'").fetchone()
 lay = json.loads(row[1]) if isinstance(row[1], str) else row[1]
 from app.services.worker import _ocr_document

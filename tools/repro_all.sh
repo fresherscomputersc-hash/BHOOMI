@@ -1,9 +1,9 @@
 set -e
-cd /home/ubuntu/Bhuverify-pilot
+cd /home/ubuntu/BhuSure-pilot
 STRESS="DOC-7E22D7E8FE,DOC-A34D3132C0,DOC-77EADAF0A1,DOC-0311738E10,DOC-5F11B732FA"
 REAL="DOC-1FB224189E,DOC-32EF2C9A42,DOC-5079BA613F,DOC-8254348B5A,DOC-C6716C084E"
 sed -i 's/^GROQ_ENABLED=.*/GROQ_ENABLED=0/' .env.pilot
-sudo systemctl restart bhuverify-pilot
+sudo systemctl restart bhusure-pilot
 sleep 12
 ./venv-pilot/bin/python - "$STRESS $REAL" <<'PYEOF'
 import json, sys, urllib.request
@@ -24,6 +24,6 @@ PYEOF
 tail -3 /home/ubuntu/stress-full5.log
 tail -3 /home/ubuntu/realror-full3.log
 sed -i 's/^GROQ_ENABLED=.*/GROQ_ENABLED=1/' .env.pilot
-sudo systemctl restart bhuverify-pilot
+sudo systemctl restart bhusure-pilot
 sleep 10
-sudo systemctl is-active bhuverify-pilot
+sudo systemctl is-active bhusure-pilot

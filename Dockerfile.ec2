@@ -1,5 +1,5 @@
 # EC2 pilot image ONLY. NEVER referenced by render.yaml (GitHub/Render stays slim).
-# Build on the EC2 box:  docker build -f Dockerfile.ec2 -t bhuverify:ec2 .
+# Build on the EC2 box:  docker build -f Dockerfile.ec2 -t bhusure:ec2 .
 FROM python:3.11-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \

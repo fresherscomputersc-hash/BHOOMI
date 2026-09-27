@@ -1,5 +1,5 @@
 import sqlite3
-c = sqlite3.connect("data/bhuverify.db")
+c = sqlite3.connect("data/bhusure.db")
 for fn in ("eng_01_clean_ror.png", "stress_05_mutation.png", "hin_01_up_khatauni.png"):
     d = c.execute("select doc_id, status, ocr_word_count, processed_at from source_documents where original_filename=?", (fn,)).fetchone()
     print(fn, d)

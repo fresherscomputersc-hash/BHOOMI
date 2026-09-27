@@ -1,5 +1,5 @@
 import json
-rep = json.load(open("/home/ubuntu/Bhuverify-pilot/data/stress/report_full.json"))
+rep = json.load(open("/home/ubuntu/BhuSure-pilot/data/stress/report_full.json"))
 for d in rep[2:]:
     print("=" * 70)
     print(d.get("file"), d.get("status"), "err:", (d.get("error") or "")[:200])

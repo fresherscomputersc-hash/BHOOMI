@@ -1,12 +1,12 @@
 set -e
-cd /home/ubuntu/Bhuverify-pilot
+cd /home/ubuntu/BhuSure-pilot
 grep -q HF_HTR_ENABLED .env.pilot || echo "HF_HTR_ENABLED=1" >> .env.pilot
 sed -i 's/^HF_HTR_ENABLED=.*/HF_HTR_ENABLED=1/' .env.pilot
 grep -E "^(HF|GROQ_ENABLED)" .env.pilot
 sudo systemctl daemon-reload
-sudo systemctl restart bhuverify-pilot
+sudo systemctl restart bhusure-pilot
 sleep 45
-sudo systemctl is-active bhuverify-pilot
+sudo systemctl is-active bhusure-pilot
 ./venv-pilot/bin/python - <<'PYEOF'
 import json, urllib.request
 BASE = "http://127.0.0.1:8001"
@@ -23,7 +23,7 @@ PYEOF
 ./venv-pilot/bin/python tools/refetch.py --dir data/stress_hindi --docs DOC-17A725D645 > /home/ubuntu/trocr-hin03.log 2>&1
 ./venv-pilot/bin/python - <<'PYEOF'
 import json
-rep = json.load(open("/home/ubuntu/Bhuverify-pilot/data/stress_hindi/report_full.json"))
+rep = json.load(open("/home/ubuntu/BhuSure-pilot/data/stress_hindi/report_full.json"))
 for d in rep:
     if d.get("doc_id") == "DOC-17A725D645":
         print("hin03:", d["status"], "ocr:", d["ocr_words"], d["ocr_conf"])
